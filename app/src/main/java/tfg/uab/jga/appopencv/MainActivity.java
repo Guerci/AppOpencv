@@ -1,9 +1,16 @@
 package tfg.uab.jga.appopencv;
 
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.SurfaceView;
+import android.view.View;
+import android.view.WindowManager;
+
 
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
@@ -15,87 +22,81 @@ import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.imgproc.Imgproc;
 
+import java.io.File;
+
 import static java.lang.System.loadLibrary;
 
-public class MainActivity extends AppCompatActivity implements CameraBridgeViewBase.CvCameraViewListener2 {
-    private static String TAG = "MainActivity";
-    JavaCameraView javaCameraView;
-    Mat mRgba;
-    BaseLoaderCallback mLoaderCallBack = new BaseLoaderCallback(this) {
-        @Override
-        public void onManagerConnected(int status) {
-            switch (status){
-                case BaseLoaderCallback.SUCCESS:
-                    javaCameraView.enableView();
-                    break;
-                default:
-                    super.onManagerConnected(status);
-                    break;
-            }
+public class MainActivity extends AppCompatActivity {
+    // Loads camera view of OpenCV for us to use. This lets us see using OpenCV
+    private CameraBridgeViewBase mOpenCvCameraView;
 
-        }
-    };
-    static{
-        loadLibrary("opencv_java3");
+    // Used in Camera selection from menu (when implemented)
+    private boolean mIsJavaCamera = true;
+    private MenuItem mItemSwitchCamera = null;
+    static final int GALLERY_REQUEST = 20;
+    static final int CAM_REQUEST = 1;
+    // These variables are used (at the moment) to fix camera orientation from 270degree to 0degree
 
-    }
+
+    private static String TAG = "CameraActivity";
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.i(TAG, "main activity layout");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        javaCameraView = (JavaCameraView)findViewById(R.id.java_camera_view);
-        javaCameraView.setVisibility(SurfaceView.VISIBLE);
-        javaCameraView.setCvCameraViewListener(this);
+
+
+    }
+
+    public void onImageCamera(View view) {
+        Intent intent = new Intent(this, CameraActivity.class);
+        startActivity(intent);
+    }
+
+    public void onImageGallery(View v) {
+        //invoke the image gallery with an implicit intent
+        Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+        //directori de la galeria
+        File picturesDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        String picturesDirPath = picturesDir.getPath();
+        Uri data = Uri.parse(picturesDirPath);
+        //set data type
+        photoPickerIntent.setDataAndType(data, "image/*");
+
+        startActivityForResult(photoPickerIntent, GALLERY_REQUEST);
+
+
     }
 
     @Override
-    protected void onPause(){
-        super.onPause();
-        if(javaCameraView != null){
-            javaCameraView.disableView();
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        switch (requestCode) {
+            /*case CAM_REQUEST:
+
+                Uri imgUri = Uri.parse("file://" + imagePath);
+
+                Intent load2Activity = new Intent(this,DisplayImage.class);
+
+                load2Activity.putExtra("uri",imgUri);
+                startActivity(load2Activity);
+                break;
+*/
+            case GALLERY_REQUEST:
+                if (resultCode == RESULT_OK) {
+                    Uri imageUri = data.getData(); //adress of the image
+                    //declare a stream to read the image data
+
+                    Intent loadDisplayActivity = new Intent(this, DetailPicture.class);
+                    loadDisplayActivity.putExtra("uri", imageUri);
+                    loadDisplayActivity.putExtra("code", GALLERY_REQUEST);
+                    startActivity(loadDisplayActivity);
+
+
+                }
+
         }
-
-    }
-
-    @Override
-    protected void onDestroy(){
-        super.onDestroy();
-        if(javaCameraView != null){
-            javaCameraView.disableView();
-        }
-
-    }
-
-    @Override
-    protected void onResume(){
-        super.onResume();
-        if(OpenCVLoader.initDebug()){
-            Log.d(TAG,"opencv loaded");
-            mLoaderCallBack.onManagerConnected(LoaderCallbackInterface.SUCCESS);
-
-        }else{
-            Log.d(TAG,"Opencv failed to load");
-            OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_1_0,this,mLoaderCallBack);
-        }
-    }
-
-    @Override
-    public void onCameraViewStarted(int width, int height) {
-        mRgba = new Mat(height,width, CvType.CV_8SC4);
-
-    }
-
-    @Override
-    public void onCameraViewStopped() {
-        mRgba.release();
-    }
-
-    @Override
-    public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
-        mRgba = inputFrame.rgba();
-        Mat mRgbaT = mRgba.t();
-        Core.flip(mRgba.t(), mRgbaT, 1);
-        Imgproc.resize(mRgbaT, mRgbaT, mRgba.size());
-        return mRgbaT;
     }
 }

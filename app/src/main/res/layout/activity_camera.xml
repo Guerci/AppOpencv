@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical" android:layout_width="match_parent"
+    xmlns:opencv="http://schemas.android.com/apk/res-auto"
+    android:layout_height="match_parent">
+
+    <org.opencv.android.JavaCameraView
+        android:id="@+id/show_camera_activity_java_surface_view"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        opencv:camera_id="any"
+        opencv:show_fps="false"
+        opencv:layout_constraintDimensionRatio="h,1:1"
+        android:layout_marginTop="8dp"
+        opencv:layout_constraintTop_toTopOf="parent"
+        android:layout_marginRight="8dp"
+        opencv:layout_constraintRight_toRightOf="parent"
+        android:layout_marginLeft="8dp"
+        opencv:layout_constraintLeft_toLeftOf="parent"
+        opencv:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="8dp" />
+
+    <Button
+        android:id="@+id/button_take_picture"
+        android:layout_width="88dp"
+        android:layout_height="wrap_content"
+        android:onClick="onClickSave"
+        android:text="Button"
+        android:visibility="visible"
+        android:layout_marginTop="8dp"
+        opencv:layout_constraintTop_toBottomOf="@+id/show_camera_activity_java_surface_view"
+        android:layout_marginLeft="8dp"
+        opencv:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginRight="8dp"
+        opencv:layout_constraintRight_toRightOf="parent"
+        opencv:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="8dp" />
+
+</android.support.constraint.ConstraintLayout>
