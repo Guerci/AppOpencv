@@ -80,8 +80,9 @@ public class DetailPicture extends AppCompatActivity {
         int width = img.width();
         int height = img.height();
 
-        Bitmap bmp = null;
-        bmp.createBitmap(width,height,Bitmap.Config.ARGB_8888);
+        Bitmap bmp = Bitmap.createBitmap(width,height,Bitmap.Config.ARGB_8888);
+
+
         Mat tmp;
         tmp = img.channels() == 1 ? new Mat (width,height, CvType.CV_8UC1,new Scalar(1)) : new Mat(width,height,CvType.CV_8UC3,new Scalar(3));
         try{

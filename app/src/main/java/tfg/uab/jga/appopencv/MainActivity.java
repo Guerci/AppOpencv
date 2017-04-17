@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 
 
@@ -36,9 +37,16 @@ public class MainActivity extends AppCompatActivity {
     static final int GALLERY_REQUEST = 20;
     static final int CAM_REQUEST = 1;
     // These variables are used (at the moment) to fix camera orientation from 270degree to 0degree
+    private static String TAG = "MainActivity";
+    static {
+        if (OpenCVLoader.initDebug()) {
+            Log.i(TAG, "OpenCV initialize success");
+        } else {
+            Log.i(TAG, "OpenCV initialize failed");
+        }
+    }
 
 
-    private static String TAG = "CameraActivity";
 
 
     @Override
@@ -68,6 +76,17 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(photoPickerIntent, GALLERY_REQUEST);
 
 
+    }
+
+
+    public void onListLuminance(View v){
+        Intent loadListLuminance = new Intent(this,ListLuminanceContainer.class);
+        startActivity(loadListLuminance);
+    }
+
+    public void onAddLuminance(View v){
+        Intent loadAddLuminance = new Intent(this,AddLuminance.class);
+        startActivity(loadAddLuminance);
     }
 
     @Override
