@@ -2,6 +2,7 @@ package tfg.uab.jga.appopencv;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import com.google.gson.Gson;
 
@@ -16,7 +17,7 @@ import static android.content.Context.MODE_PRIVATE;
  */
 
 public class SharedPref {
-
+    private static String TAG = "sharedPredClass";
     public static final String LUM_NAME = "LUMINANCE";
 
     public SharedPref(){
@@ -44,8 +45,26 @@ public class SharedPref {
 
     public void removeLuminance(Context context, Luminance luminance){
         ArrayList<Luminance> listLumi = getLuminance(context);
+        int removeId = luminance.getId();
+        int index = 0;
+        boolean removed = false;
+        Luminance lum;
+        boolean stop = false;
         if(listLumi != null){
-            listLumi.remove(luminance);
+
+            while(removed == false && stop == false){
+                lum = listLumi.get(index);
+                if(lum.getId() == removeId){
+                    listLumi.remove(index);
+                    removed = true;
+                }
+                if(index < listLumi.size()){
+                    index++;
+                }else{
+                    stop = true;
+                }
+            }
+
             saveLuminance(context,listLumi);
         }
     }
@@ -67,7 +86,48 @@ public class SharedPref {
         return (ArrayList<Luminance>) listLumi;
     }
 
+    public void editLuminance(Context context, Luminance luminanceOld, int red, int green, int blue, String name, int alpha){
+        ArrayList<Luminance> listLumi = getLuminance(context);
+        int positiondelete;
 
+        int editId = luminanceOld.getId();
+        Log.i(TAG,"id to edit: " + editId);
+        int index = 0;
+
+        boolean edit = false;
+        Luminance lum;
+        boolean stop = false;
+
+
+        while(edit == false && stop == false){
+            lum = listLumi.get(index);
+            Log.i(TAG,"id in array: " + lum.getId());
+            if(lum.getId() == editId){
+
+                lum.setBlue(blue);
+                lum.setGreen(green);
+                lum.setRed(red);
+                lum.setName(name);
+                lum.setAlpha(alpha);
+                listLumi.set(index,lum);
+                edit = true;
+            }
+
+            if(index < listLumi.size()){
+                index++;
+            }else{
+                Log.i(TAG,"no s'ha trobat per editar");
+                stop = true;
+            }
+        }
+
+        if(stop == true){
+            Log.i(TAG,"no s'ha trobat l'objecte");
+        }
+        else{
+            saveLuminance(context,listLumi);
+        }
+    }
 
 
 }

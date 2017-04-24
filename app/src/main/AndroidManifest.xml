@@ -27,7 +27,7 @@
             android:label="@string/title_activity_camera" />
         <activity android:name=".DetailPicture" />
         <activity android:name=".AddLuminance" />
-        <activity android:name=".ListLuminanceContainer" >
+        <activity android:name=".ListLuminance" >
       </activity>
     </application>
 

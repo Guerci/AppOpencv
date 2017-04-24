@@ -66,9 +66,9 @@ public class ListLuminanceAdapter extends ArrayAdapter<Luminance> {
             holder = (ViewHolder) convertView.getTag();
         }
         Luminance lum = (Luminance) getItem(position);
-        holder.textBlue.setText(lum.getBlue());
-        holder.textRed.setText(lum.getRed());
-        holder.textGreen.setText(lum.getGreen());
+        holder.textBlue.setText(Integer.toString(lum.getBlue()));
+        holder.textRed.setText(Integer.toString(lum.getRed()));
+        holder.textGreen.setText(Integer.toString(lum.getGreen()));
         holder.textName.setText(lum.getName());
         return convertView;
     }
@@ -86,6 +86,8 @@ public class ListLuminanceAdapter extends ArrayAdapter<Luminance> {
         luminanceList.remove(luminance);
         notifyDataSetChanged();
     }
+
+
 
 
 }

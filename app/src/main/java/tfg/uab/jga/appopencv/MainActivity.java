@@ -36,6 +36,9 @@ public class MainActivity extends AppCompatActivity {
     private MenuItem mItemSwitchCamera = null;
     static final int GALLERY_REQUEST = 20;
     static final int CAM_REQUEST = 1;
+    static final int ADD_LUM = 10;
+    static final int LIST_LUM = 2;
+
     // These variables are used (at the moment) to fix camera orientation from 270degree to 0degree
     private static String TAG = "MainActivity";
     static {
@@ -80,13 +83,18 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void onListLuminance(View v){
-        Intent loadListLuminance = new Intent(this,ListLuminanceContainer.class);
+        Intent loadListLuminance = new Intent(this,ListLuminance.class);
+        loadListLuminance.putExtra("Code",LIST_LUM);
         startActivity(loadListLuminance);
     }
 
     public void onAddLuminance(View v){
-        Intent loadAddLuminance = new Intent(this,AddLuminance.class);
-        startActivity(loadAddLuminance);
+      //  Intent loadAddLuminance = new Intent(this,AddLuminance.class);
+        Intent loadAddLum = new Intent(this,AddLuminance.class);
+        loadAddLum.putExtra("code",ADD_LUM);
+        startActivity(loadAddLum);
+       // startActivityForResult(loadAddLuminance,ADD_LUM);
+        //startActivity(loadAddLuminance);
     }
 
     @Override

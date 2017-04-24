@@ -1,7 +1,10 @@
 package tfg.uab.jga.appopencv;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
@@ -27,10 +30,14 @@ import static org.opencv.imgproc.Imgproc.cvtColor;
 
 public class DetailPicture extends AppCompatActivity {
     ImageView imageView;
-    Button btnProcess;
+    Button btnProcess, btnAddEff, btnSelectEff;
+
     Bitmap bmpInput, bmpOutput;
     Mat matInput, matOutput;
     Mat matProcess;
+    Luminance effect;
+    static final int SELECT_EFFECT = 100;
+    static final int USE_EFFECT = 35;
     static{System.loadLibrary("opencv_java3"); }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +46,9 @@ public class DetailPicture extends AppCompatActivity {
 
         imageView = (ImageView) findViewById(R.id.imageView);
         btnProcess = (Button) findViewById(R.id.btnProcess);
+        btnAddEff = (Button) findViewById(R.id.add_effect);
+        btnSelectEff = (Button) findViewById(R.id.select_effect);
+        btnAddEff.setVisibility(View.INVISIBLE);
         //Bundle bd = getIntent().getExtras();
         int code = getIntent().getExtras().getInt("code");
         if(code == 1){
@@ -61,9 +71,70 @@ public class DetailPicture extends AppCompatActivity {
         matProcess  = convertBitmap2Mat(bmpInput);
         matProcess = getProcess(matProcess);
         bmpInput = convertMat2Bitmap(matProcess);
-        imageView.setImageBitmap(bmpInput   );
+        imageView.setImageBitmap(bmpInput);
 
     }
+
+    public void onSelectEffect(View v){
+        Intent getEffect = new Intent(this,ListLuminance.class);
+        getEffect.putExtra("Code",USE_EFFECT);
+        startActivityForResult(getEffect,SELECT_EFFECT);
+    }
+
+    public void onAddEffect(View v){
+        int width = bmpInput.getWidth();
+        int height = bmpInput.getHeight();
+
+        Bitmap finalBitmap = Bitmap.createBitmap(width,height,bmpInput.getConfig());
+
+        final double grayScale_Red = 0.3;
+        final double grayScale_Green = 0.59;
+        final double grayScale_Blue = 0.11;
+
+        int red = effect.getRed();
+        int green = effect.getGreen();
+        int blue = effect.getBlue();
+        int depth = effect.getAlpha();
+
+
+        int channel_aplha, channel_red, channel_green, channel_blue;
+        int pixel;
+
+        for(int x = 0;x<width;x++){
+            for(int y = 0;y<height;y++){
+                pixel = bmpInput.getPixel(x,y);
+                channel_aplha = Color.alpha(pixel);
+                channel_red = Color.red(pixel);
+                channel_blue = Color.blue(pixel);
+                channel_green = Color.green(pixel);
+
+
+                channel_blue = channel_green = channel_red = (int)(grayScale_Red * channel_red + grayScale_Green *
+                channel_green + grayScale_Blue * channel_blue);
+
+                channel_red += (depth * red);
+                if(channel_red> 255){
+                    channel_red = 255;
+                }
+                channel_blue += (depth * blue);
+                if(channel_blue> 255){
+                    channel_blue = 255;
+                }
+                channel_green += (depth * green);
+                if(channel_green> 255){
+                    channel_green = 255;
+                }
+
+                finalBitmap.setPixel(x,y,Color.argb(channel_aplha,channel_red,channel_green,channel_blue));
+
+            }
+        }
+
+
+        imageView.setImageBitmap(finalBitmap);
+
+    }
+
     Mat convertBitmap2Mat(Bitmap img){
 
         Mat rgbaMat = new Mat(img.getHeight(),img.getWidth(), CvType.CV_8UC4);
@@ -198,5 +269,21 @@ public class DetailPicture extends AppCompatActivity {
         Mat imgGrey = new Mat(height,width,CvType.CV_8UC1);
         Imgproc.cvtColor(image,imgGrey,Imgproc.COLOR_RGB2GRAY);
         return imgGrey;
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if (requestCode == SELECT_EFFECT) {
+            if(resultCode == Activity.RESULT_OK){
+                effect= (Luminance) data.getSerializableExtra("result");
+                btnAddEff.setVisibility(View.VISIBLE);
+
+            }
+            if (resultCode == Activity.RESULT_CANCELED) {
+                Toast.makeText(this,"no s'ha pogut seleccionar l'effecte", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 }
