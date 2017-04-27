@@ -3,6 +3,7 @@ package tfg.uab.jga.appopencv;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Random;
 
 public class Luminance implements Serializable{
     private int id;
@@ -12,6 +13,16 @@ public class Luminance implements Serializable{
 
     public Luminance(){
         super();
+    }
+
+    public Luminance(ArrayList<Integer> rgba){
+        this.red = rgba.get(0);
+        this.green = rgba.get(1);
+        this.blue = rgba.get(2);
+        this.alpha = rgba.get(3);
+        Random r = new Random();
+        this.id = r.nextInt();
+        this.name = "Fet des de DetailPicture";
     }
 
     public Luminance(int id, String name, int red, int green, int blue, int alpha){

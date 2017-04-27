@@ -5,11 +5,14 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -25,13 +28,14 @@ import org.opencv.imgproc.Imgproc;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 
 import static org.opencv.imgproc.Imgproc.cvtColor;
 
 public class DetailPicture extends AppCompatActivity {
     ImageView imageView;
     Button btnProcess, btnAddEff, btnSelectEff;
-
+    SharedPref sp;
     Bitmap bmpInput, bmpOutput;
     Mat matInput, matOutput;
     Mat matProcess;
@@ -49,6 +53,9 @@ public class DetailPicture extends AppCompatActivity {
         btnAddEff = (Button) findViewById(R.id.add_effect);
         btnSelectEff = (Button) findViewById(R.id.select_effect);
         btnAddEff.setVisibility(View.INVISIBLE);
+
+        sp = new SharedPref();
+
         //Bundle bd = getIntent().getExtras();
         int code = getIntent().getExtras().getInt("code");
         if(code == 1){
@@ -65,7 +72,18 @@ public class DetailPicture extends AppCompatActivity {
 
 
     }
+
+
     public void onClickProcess(View v){
+
+        Toast.makeText(DetailPicture.this,"Yey",Toast.LENGTH_LONG);
+        matProcess  = convertBitmap2Mat(bmpInput);
+        matProcess = getProcess(matProcess);
+        bmpInput = convertMat2Bitmap(matProcess);
+        imageView.setImageBitmap(bmpInput);
+
+    }
+    public void onClickProcess(){
 
         Toast.makeText(DetailPicture.this,"Yey",Toast.LENGTH_LONG);
         matProcess  = convertBitmap2Mat(bmpInput);
@@ -80,7 +98,11 @@ public class DetailPicture extends AppCompatActivity {
         getEffect.putExtra("Code",USE_EFFECT);
         startActivityForResult(getEffect,SELECT_EFFECT);
     }
-
+    public void onSelectEffect(){
+        Intent getEffect = new Intent(this,ListLuminance.class);
+        getEffect.putExtra("Code",USE_EFFECT);
+        startActivityForResult(getEffect,SELECT_EFFECT);
+    }
     public void onAddEffect(View v){
         int width = bmpInput.getWidth();
         int height = bmpInput.getHeight();
@@ -135,6 +157,59 @@ public class DetailPicture extends AppCompatActivity {
 
     }
 
+    public void onAddEffect(){
+        int width = bmpInput.getWidth();
+        int height = bmpInput.getHeight();
+
+        Bitmap finalBitmap = Bitmap.createBitmap(width,height,bmpInput.getConfig());
+
+        final double grayScale_Red = 0.3;
+        final double grayScale_Green = 0.59;
+        final double grayScale_Blue = 0.11;
+
+        int red = effect.getRed();
+        int green = effect.getGreen();
+        int blue = effect.getBlue();
+        int depth = effect.getAlpha();
+
+
+        int channel_aplha, channel_red, channel_green, channel_blue;
+        int pixel;
+
+        for(int x = 0;x<width;x++){
+            for(int y = 0;y<height;y++){
+                pixel = bmpInput.getPixel(x,y);
+                channel_aplha = Color.alpha(pixel);
+                channel_red = Color.red(pixel);
+                channel_blue = Color.blue(pixel);
+                channel_green = Color.green(pixel);
+
+
+                channel_blue = channel_green = channel_red = (int)(grayScale_Red * channel_red + grayScale_Green *
+                        channel_green + grayScale_Blue * channel_blue);
+
+                channel_red += (depth * red);
+                if(channel_red> 255){
+                    channel_red = 255;
+                }
+                channel_blue += (depth * blue);
+                if(channel_blue> 255){
+                    channel_blue = 255;
+                }
+                channel_green += (depth * green);
+                if(channel_green> 255){
+                    channel_green = 255;
+                }
+
+                finalBitmap.setPixel(x,y,Color.argb(channel_aplha,channel_red,channel_green,channel_blue));
+
+            }
+        }
+
+
+        imageView.setImageBitmap(finalBitmap);
+
+    }
     Mat convertBitmap2Mat(Bitmap img){
 
         Mat rgbaMat = new Mat(img.getHeight(),img.getWidth(), CvType.CV_8UC4);
@@ -185,7 +260,7 @@ public class DetailPicture extends AppCompatActivity {
     }
 
     private void getImageFromGallery(Uri uri){
-        ;
+
 
         try{
 
@@ -272,6 +347,19 @@ public class DetailPicture extends AppCompatActivity {
     }
 
 
+
+    public void onGetLumFromImage(View v){
+        ArrayList<Integer> rgba = new ArrayList<>();
+        Bitmap src = ((BitmapDrawable)imageView.getDrawable()).getBitmap();
+
+        rgba = ProcessImage.getLumFromImage(src);
+        Luminance lum = new Luminance(rgba);
+        sp.addLuminance(this,lum);
+        Toast.makeText(this,"lum added",Toast.LENGTH_LONG).show();
+    }
+
+
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
@@ -285,5 +373,39 @@ public class DetailPicture extends AppCompatActivity {
                 Toast.makeText(this,"no s'ha pogut seleccionar l'effecte", Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        //inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_detail_picture, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+
+            case R.id.action_proces_image:
+                onClickProcess();
+                return true;
+            case R.id.action_add_luminance:
+                onAddEffect();
+                return true;
+            case R.id.action_select_lum:
+                onSelectEffect();
+                return true;
+
+            case R.id.action_save_image:
+                return true;
+            default:
+                // If we got here, the user's action was not recognized.
+                // Invoke the superclass to handle it.
+                return super.onOptionsItemSelected(item);
+        }
+
+
     }
 }
