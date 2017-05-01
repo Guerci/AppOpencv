@@ -45,22 +45,25 @@ public class ListLuminance extends AppCompatActivity {
 
         codeIntent = getIntent().getExtras().getInt("Code");
         Log.i(TAG, "Codi: " + codeIntent);
-        luminanceListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            public void onItemClick(AdapterView<?> adapter, View v, int position, long id) {
-                //Luminance selItem = (Luminance) adapter.getItem(position);
-                Luminance lum = luminance.get(position);
+        if (luminance != null){
+            luminanceListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                public void onItemClick(AdapterView<?> adapter, View v, int position, long id) {
+                    //Luminance selItem = (Luminance) adapter.getItem(position);
+                    Luminance lum = luminance.get(position);
 
-                if (codeIntent == LIST_LUM) {
-                    startAddLuminance(lum);
-                } else if (codeIntent == USE_EFFECT) {
-                    Log.i(TAG, "dintre seleccionar effecte");
-                    getLuminance(lum);
+                    if (codeIntent == LIST_LUM) {
+                        startAddLuminance(lum);
+                    } else if (codeIntent == USE_EFFECT) {
+                        Log.i(TAG, "dintre seleccionar effecte");
+                        getLuminance(lum);
+
+                    }
+
 
                 }
+            });
+        }
 
-
-            }
-        });
 
     }
 
@@ -97,20 +100,23 @@ public class ListLuminance extends AppCompatActivity {
         sharedPref = new SharedPref();
         populateLuminanceList();
         codeIntent = getIntent().getExtras().getInt("Code");
-        luminanceListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            public void onItemClick(AdapterView<?> adapter, View v, int position, long id) {
-                //Luminance selItem = (Luminance) adapter.getItem(position);
-                Luminance lum = luminance.get(position);
-                if (codeIntent == LIST_LUM) {
-                    startAddLuminance(lum);
-                } else if (codeIntent == USE_EFFECT) {
-                    Log.i(TAG, "dintre seleccionar effecte");
-                    getLuminance(lum);
+        if(luminance != null){
+            luminanceListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                public void onItemClick(AdapterView<?> adapter, View v, int position, long id) {
+                    //Luminance selItem = (Luminance) adapter.getItem(position);
+                    Luminance lum = luminance.get(position);
+                    if (codeIntent == LIST_LUM) {
+                        startAddLuminance(lum);
+                    } else if (codeIntent == USE_EFFECT) {
+                        Log.i(TAG, "dintre seleccionar effecte");
+                        getLuminance(lum);
+
+                    }
 
                 }
+            });
+        }
 
-            }
-        });
     }
 
     @Override

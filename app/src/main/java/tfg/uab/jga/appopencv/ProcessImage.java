@@ -3,6 +3,7 @@ package tfg.uab.jga.appopencv;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 
+import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 
 import java.util.ArrayList;
@@ -61,6 +62,9 @@ public class ProcessImage {
         RGBA.add(R);
         RGBA.add(G);
         RGBA.add(B);
+        if (A == 255){
+            A = 5;
+        }
         RGBA.add(A);
 
         return RGBA;
@@ -77,5 +81,35 @@ public class ProcessImage {
         }
         average = (double) sum/data.length;
         return average;
+    }
+
+    public static ArrayList<Integer> getRGBfromMat(Mat src) {
+        int width = src.width();
+        int height = src.height();
+        int channels = src.channels();
+        src.convertTo(src, CvType.CV_64FC3);
+        int size = (int) src.total() * src.channels();
+        ArrayList<Integer> rgb = new ArrayList<>();
+        double[] tmp = new double[size];
+
+        int[] redP = new int[width*height];
+        int[] greenP = new int[width*height];
+        int[] blueP = new int[width*height];
+        int[] alphaP = new int[width*height];
+        int[] pixels = new int[width*height];
+
+        int R,G,B,A;
+        int index;
+        int color;
+
+        ArrayList<Integer> RGBA = new ArrayList<>();
+        if (channels == 3){
+            for(int y = 0;y<height;y++){
+                for(int x = 0;x<width;x++){
+                    tmp = src.get(x,y);
+                }
+            }
+        }
+        return rgb;
     }
 }

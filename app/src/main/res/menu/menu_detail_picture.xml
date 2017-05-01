@@ -20,5 +20,9 @@
         android:id="@+id/action_save_image"
         android:title="@string/save_image"
         app:showAsAction="ifRoom"/>
+    <item
+        android:id="@+id/action_get_luminance"
+        android:title="@string/get_luminance"
+        app:showAsAction="ifRoom"/>
 
 </menu>
