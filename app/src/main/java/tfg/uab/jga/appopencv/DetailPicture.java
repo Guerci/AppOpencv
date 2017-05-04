@@ -53,6 +53,10 @@ public class DetailPicture extends AppCompatActivity {
         btnAddEff = (Button) findViewById(R.id.add_effect);
         btnSelectEff = (Button) findViewById(R.id.select_effect);
         btnAddEff.setVisibility(View.INVISIBLE);
+        //put button in invisibe for testing
+        btnAddEff.setVisibility(View.INVISIBLE);
+        btnProcess.setVisibility(View.INVISIBLE);
+        btnSelectEff.setVisibility(View.INVISIBLE);
 
         sp = new SharedPref();
 
@@ -358,7 +362,15 @@ public class DetailPicture extends AppCompatActivity {
         Toast.makeText(this,"lum added",Toast.LENGTH_LONG).show();
     }
 
+    public void onGetLumFromImage(){
+        ArrayList<Integer> rgba = new ArrayList<>();
+        Bitmap src = ((BitmapDrawable)imageView.getDrawable()).getBitmap();
 
+        rgba = ProcessImage.getLumFromImage(src);
+        Luminance lum = new Luminance(rgba);
+        sp.addLuminance(this,lum);
+        Toast.makeText(this,"lum added",Toast.LENGTH_LONG).show();
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -399,6 +411,9 @@ public class DetailPicture extends AppCompatActivity {
                 return true;
 
             case R.id.action_save_image:
+                return true;
+            case R.id.action_get_luminance:
+                onGetLumFromImage();
                 return true;
             default:
                 // If we got here, the user's action was not recognized.

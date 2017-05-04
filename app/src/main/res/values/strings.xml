@@ -6,4 +6,5 @@
     <string name="select_luminance">Select Luminance</string>
     <string name="add_luminance_menu">Add Luminance</string>
     <string name="save_image">Save Image</string>
+    <string name="get_luminance">Get luminance</string>
 </resources>
