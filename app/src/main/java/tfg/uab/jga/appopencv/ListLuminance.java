@@ -34,11 +34,8 @@ public class ListLuminance extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.list_luminance_fragment);
-        /*
-        Toolbar myToolbar = (Toolbar) findViewById(R.id.toolbar_list);
-        setSupportActionBar(myToolbar);
-*/
-        ActionBar ab = getActionBar();
+
+        //ActionBar ab = getActionBar();
 
         sharedPref = new SharedPref();
         populateLuminanceList();

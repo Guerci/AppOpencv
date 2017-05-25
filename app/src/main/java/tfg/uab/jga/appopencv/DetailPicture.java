@@ -1,13 +1,18 @@
 package tfg.uab.jga.appopencv;
 
 import android.app.Activity;
+import android.content.CursorLoader;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -25,6 +30,7 @@ import org.opencv.core.Mat;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,8 +46,10 @@ public class DetailPicture extends AppCompatActivity {
     Mat matInput, matOutput;
     Mat matProcess;
     Luminance effect;
+    String TAG = "DetailPicture";
     static final int SELECT_EFFECT = 100;
     static final int USE_EFFECT = 35;
+    static final int ADD_LUM = 10;
     static{System.loadLibrary("opencv_java3"); }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -253,37 +261,44 @@ public class DetailPicture extends AppCompatActivity {
 
         // Uri uri = bd.getParcelable("uri");
         String picturePath = Environment.getExternalStorageDirectory()+"/frames/" + filename; //arreglar amb un path absolut
-
+        File f = new File(Environment.getExternalStorageDirectory()+"/frames/" + filename);
+        String path = f.getAbsolutePath();
         // bmpInput = getBitmap(uri);
         BitmapFactory.Options opt = new BitmapFactory.Options();
         opt.inPreferredConfig = Bitmap.Config.ARGB_8888;
         bmpInput = BitmapFactory.decodeFile(picturePath,opt);
+        rotateBitmap(path);
         imageView.setImageBitmap(bmpInput);
         //matInput = convertBitmap2Mat(bmpInput);
         //matOutput = new Mat(matInput.rows(),matInput.cols(),CvType.CV_8UC3);
     }
 
     private void getImageFromGallery(Uri uri){
-
-
         try{
-
             bmpInput = getBitmap(uri);
 
-
+            String path = getRealPathFromURI(uri);
+            rotateBitmap(path);
             if(bmpInput != null){
                 imageView.setImageBitmap(bmpInput);
             }else{
                 Toast.makeText(this, "Error al capturar la imatge", Toast.LENGTH_LONG).show();
             }
 
-
-
-
         } catch (Exception e) {
             Toast.makeText(this, "No s'ha pogut mostrar la imatge", Toast.LENGTH_LONG).show();
             e.printStackTrace();
         }
+    }
+    private String getRealPathFromURI(Uri contentUri) {
+        String[] proj = { MediaStore.Images.Media.DATA };
+        CursorLoader loader = new CursorLoader(this, contentUri, proj, null, null, null);
+        Cursor cursor = loader.loadInBackground();
+        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+        String result = cursor.getString(column_index);
+        cursor.close();
+        return result;
     }
 
     public Bitmap getBitmap(Uri path){
@@ -344,16 +359,42 @@ public class DetailPicture extends AppCompatActivity {
     private Mat getProcess(Mat image){
         int height = image.height();
         int width = image.width();
-
+        /*
         Mat imgGrey = new Mat(height,width,CvType.CV_8UC1);
-        Imgproc.cvtColor(image,imgGrey,Imgproc.COLOR_RGB2GRAY);
-        return imgGrey;
+        Imgproc.cvtColor(image,imgGrey,Imgproc.COLOR_RGB2GRAY);*/
+
+        ProcessImage pi = new ProcessImage();
+        pi.surroundModulation(image);
+
+
+        return image;
     }
 
-
+    public void rotateBitmap(String path){
+        try{
+            ExifInterface exif = new ExifInterface(path);
+            int rotation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION,ExifInterface.ORIENTATION_NORMAL);
+            Log.d(TAG,String.valueOf(rotation));
+            int rotationInDegrees = exifToDegrees(rotation);
+            Log.d(TAG,String.valueOf(rotationInDegrees));
+            Matrix m = new Matrix();
+            if(rotation != 0f){
+                m.preRotate(rotationInDegrees);
+                bmpInput = Bitmap.createBitmap(bmpInput,0,0,bmpInput.getWidth(),bmpInput.getHeight(),m,true);
+            }
+        }catch(Exception e){
+            Log.d(TAG,"Error en rotar el bitmap");
+        }
+    }
+    private static int exifToDegrees(int exifOrientation) {
+        if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_90) { return 90; }
+        else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_180) {  return 180; }
+        else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_270) {  return 270; }
+        return 0;
+    }
 
     public void onGetLumFromImage(View v){
-        ArrayList<Integer> rgba = new ArrayList<>();
+        ArrayList<Integer> rgba;
         Bitmap src = ((BitmapDrawable)imageView.getDrawable()).getBitmap();
 
         rgba = ProcessImage.getLumFromImage(src);
@@ -363,13 +404,18 @@ public class DetailPicture extends AppCompatActivity {
     }
 
     public void onGetLumFromImage(){
-        ArrayList<Integer> rgba = new ArrayList<>();
+        ProcessImage processImage = new ProcessImage();
+        ArrayList<Integer> rgba;
         Bitmap src = ((BitmapDrawable)imageView.getDrawable()).getBitmap();
-
-        rgba = ProcessImage.getLumFromImage(src);
+        Mat imageMat = convertBitmap2Mat(src);
+        rgba = processImage.getLumFromImage(imageMat);
         Luminance lum = new Luminance(rgba);
-        sp.addLuminance(this,lum);
-        Toast.makeText(this,"lum added",Toast.LENGTH_LONG).show();
+        Intent addLum = new Intent(this,AddLuminance.class);
+        addLum.putExtra("code",20);
+        addLum.putExtra("Lum",lum);
+        startActivityForResult(addLum,ADD_LUM);
+       /* sp.addLuminance(this,lum);
+        Toast.makeText(this,"lum added",Toast.LENGTH_LONG).show();*/
     }
 
     @Override
@@ -378,12 +424,16 @@ public class DetailPicture extends AppCompatActivity {
         if (requestCode == SELECT_EFFECT) {
             if(resultCode == Activity.RESULT_OK){
                 effect= (Luminance) data.getSerializableExtra("result");
-                btnAddEff.setVisibility(View.VISIBLE);
+
 
             }
             if (resultCode == Activity.RESULT_CANCELED) {
                 Toast.makeText(this,"no s'ha pogut seleccionar l'effecte", Toast.LENGTH_SHORT).show();
             }
+        }else if(requestCode == ADD_LUM){
+            Luminance lum = (Luminance) data.getSerializableExtra("result");
+            sp.addLuminance(this,lum);
+            Toast.makeText(this,"Lum Added",Toast.LENGTH_LONG).show();
         }
     }
 

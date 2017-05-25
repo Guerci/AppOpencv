@@ -1,5 +1,7 @@
 package tfg.uab.jga.appopencv;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.annotation.IntegerRes;
 import android.support.v7.app.AppCompatActivity;
@@ -19,6 +21,7 @@ public class AddLuminance extends AppCompatActivity {
     SharedPref sp;
     Luminance luminance;
     int code;
+    static final int ADD_LUM_AUTO = 20;
     static final int ADD_LUM = 10;
     static final int EDIT_LUM = 15;
     Luminance lum;
@@ -38,6 +41,10 @@ public class AddLuminance extends AppCompatActivity {
         if(code == EDIT_LUM){
             lum = (Luminance) getIntent().getExtras().getSerializable("luminance");
             editLuminance();
+        }else if(code == ADD_LUM_AUTO){
+            lum = (Luminance) getIntent().getExtras().getSerializable("Lum");
+            editLuminance();
+
         }
 
     }
@@ -52,10 +59,15 @@ public class AddLuminance extends AppCompatActivity {
         int alphaDepth = Integer.valueOf(alpha.getText().toString()).intValue();
         String newName = name.getText().toString();
 
-        if(code == EDIT_LUM){
-            sp.editLuminance(this,lum,redNumber,greenNumber,blueNumber,newName,alphaDepth);
+        if(code == EDIT_LUM) {
+            sp.editLuminance(this, lum, redNumber, greenNumber, blueNumber, newName, alphaDepth);
             Toast.makeText(this, "Luminance edited", Toast.LENGTH_SHORT).show();
-
+        }else if(code == ADD_LUM_AUTO){
+            luminance = new Luminance(random.nextInt(),newName,redNumber,blueNumber,greenNumber,alphaDepth);
+            Intent backToDetail = new Intent();
+            backToDetail.putExtra("result",luminance);
+            setResult(Activity.RESULT_OK,backToDetail);
+            finish();
         }else{
             luminance = new Luminance(random.nextInt(),newName,redNumber,blueNumber,greenNumber,alphaDepth);
             sp.addLuminance(this,luminance);

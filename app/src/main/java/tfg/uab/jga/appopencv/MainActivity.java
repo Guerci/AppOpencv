@@ -89,12 +89,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onAddLuminance(View v){
+        /*
       //  Intent loadAddLuminance = new Intent(this,AddLuminance.class);
         Intent loadAddLum = new Intent(this,AddLuminance.class);
         loadAddLum.putExtra("code",ADD_LUM);
         startActivity(loadAddLum);
        // startActivityForResult(loadAddLuminance,ADD_LUM);
-        //startActivity(loadAddLuminance);
+        //startActivity(loadAddLuminance);*/
+
+        ProcessImage pi = new ProcessImage();
+        pi.test();
     }
 
     @Override

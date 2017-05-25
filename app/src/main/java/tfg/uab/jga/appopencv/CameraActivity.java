@@ -146,6 +146,7 @@ public class CameraActivity extends AppCompatActivity implements CameraBridgeVie
         if(succes){
 
             File dest = new File(sd,filename);
+
             try{
                 out = new FileOutputStream(dest);
                 bmp.compress(Bitmap.CompressFormat.PNG,100,out);
