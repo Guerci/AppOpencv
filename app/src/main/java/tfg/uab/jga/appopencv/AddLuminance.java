@@ -61,7 +61,7 @@ public class AddLuminance extends AppCompatActivity {
 
         if(code == EDIT_LUM) {
             sp.editLuminance(this, lum, redNumber, greenNumber, blueNumber, newName, alphaDepth);
-            Toast.makeText(this, "Luminance edited", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, this.getString(R.string.lum_edited), Toast.LENGTH_SHORT).show();
         }else if(code == ADD_LUM_AUTO){
             luminance = new Luminance(random.nextInt(),newName,redNumber,blueNumber,greenNumber,alphaDepth);
             Intent backToDetail = new Intent();
@@ -71,7 +71,7 @@ public class AddLuminance extends AppCompatActivity {
         }else{
             luminance = new Luminance(random.nextInt(),newName,redNumber,blueNumber,greenNumber,alphaDepth);
             sp.addLuminance(this,luminance);
-            Toast.makeText(this, "Luminance added", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, this.getString(R.string.lum_added), Toast.LENGTH_SHORT).show();
         }
 
 
@@ -89,6 +89,6 @@ public class AddLuminance extends AppCompatActivity {
 
     public void onRemoveLum(View v){
         sp.removeLuminance(this,lum);
-        Toast.makeText(this,"Lumincace removed",Toast.LENGTH_LONG).show();
+        Toast.makeText(this,this.getString(R.string.lum_removed),Toast.LENGTH_LONG).show();
     }
 }

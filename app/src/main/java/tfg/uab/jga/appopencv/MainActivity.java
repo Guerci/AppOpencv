@@ -105,16 +105,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         switch (requestCode) {
-            /*case CAM_REQUEST:
 
-                Uri imgUri = Uri.parse("file://" + imagePath);
-
-                Intent load2Activity = new Intent(this,DisplayImage.class);
-
-                load2Activity.putExtra("uri",imgUri);
-                startActivity(load2Activity);
-                break;
-*/
             case GALLERY_REQUEST:
                 if (resultCode == RESULT_OK) {
                     Uri imageUri = data.getData(); //adress of the image

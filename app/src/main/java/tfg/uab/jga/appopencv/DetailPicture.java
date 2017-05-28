@@ -32,18 +32,21 @@ import org.opencv.imgproc.Imgproc;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import static org.opencv.imgproc.Imgproc.cvtColor;
 
 public class DetailPicture extends AppCompatActivity {
     ImageView imageView;
-    Button btnProcess, btnAddEff, btnSelectEff;
+
     SharedPref sp;
-    Bitmap bmpInput, bmpOutput;
-    Mat matInput, matOutput;
+    Bitmap bmpInput;
+
     Mat matProcess;
     Luminance effect;
     String TAG = "DetailPicture";
@@ -57,14 +60,7 @@ public class DetailPicture extends AppCompatActivity {
         setContentView(R.layout.activity_detail_picture);
 
         imageView = (ImageView) findViewById(R.id.imageView);
-        btnProcess = (Button) findViewById(R.id.btnProcess);
-        btnAddEff = (Button) findViewById(R.id.add_effect);
-        btnSelectEff = (Button) findViewById(R.id.select_effect);
-        btnAddEff.setVisibility(View.INVISIBLE);
-        //put button in invisibe for testing
-        btnAddEff.setVisibility(View.INVISIBLE);
-        btnProcess.setVisibility(View.INVISIBLE);
-        btnSelectEff.setVisibility(View.INVISIBLE);
+
 
         sp = new SharedPref();
 
@@ -86,15 +82,7 @@ public class DetailPicture extends AppCompatActivity {
     }
 
 
-    public void onClickProcess(View v){
 
-        Toast.makeText(DetailPicture.this,"Yey",Toast.LENGTH_LONG);
-        matProcess  = convertBitmap2Mat(bmpInput);
-        matProcess = getProcess(matProcess);
-        bmpInput = convertMat2Bitmap(matProcess);
-        imageView.setImageBitmap(bmpInput);
-
-    }
     public void onClickProcess(){
 
         Toast.makeText(DetailPicture.this,"Yey",Toast.LENGTH_LONG);
@@ -105,69 +93,13 @@ public class DetailPicture extends AppCompatActivity {
 
     }
 
-    public void onSelectEffect(View v){
-        Intent getEffect = new Intent(this,ListLuminance.class);
-        getEffect.putExtra("Code",USE_EFFECT);
-        startActivityForResult(getEffect,SELECT_EFFECT);
-    }
+
     public void onSelectEffect(){
         Intent getEffect = new Intent(this,ListLuminance.class);
         getEffect.putExtra("Code",USE_EFFECT);
         startActivityForResult(getEffect,SELECT_EFFECT);
     }
-    public void onAddEffect(View v){
-        int width = bmpInput.getWidth();
-        int height = bmpInput.getHeight();
 
-        Bitmap finalBitmap = Bitmap.createBitmap(width,height,bmpInput.getConfig());
-
-        final double grayScale_Red = 0.3;
-        final double grayScale_Green = 0.59;
-        final double grayScale_Blue = 0.11;
-
-        int red = effect.getRed();
-        int green = effect.getGreen();
-        int blue = effect.getBlue();
-        int depth = effect.getAlpha();
-
-
-        int channel_aplha, channel_red, channel_green, channel_blue;
-        int pixel;
-
-        for(int x = 0;x<width;x++){
-            for(int y = 0;y<height;y++){
-                pixel = bmpInput.getPixel(x,y);
-                channel_aplha = Color.alpha(pixel);
-                channel_red = Color.red(pixel);
-                channel_blue = Color.blue(pixel);
-                channel_green = Color.green(pixel);
-
-
-                channel_blue = channel_green = channel_red = (int)(grayScale_Red * channel_red + grayScale_Green *
-                channel_green + grayScale_Blue * channel_blue);
-
-                channel_red += (depth * red);
-                if(channel_red> 255){
-                    channel_red = 255;
-                }
-                channel_blue += (depth * blue);
-                if(channel_blue> 255){
-                    channel_blue = 255;
-                }
-                channel_green += (depth * green);
-                if(channel_green> 255){
-                    channel_green = 255;
-                }
-
-                finalBitmap.setPixel(x,y,Color.argb(channel_aplha,channel_red,channel_green,channel_blue));
-
-            }
-        }
-
-
-        imageView.setImageBitmap(finalBitmap);
-
-    }
 
     public void onAddEffect(){
         int width = bmpInput.getWidth();
@@ -187,6 +119,7 @@ public class DetailPicture extends AppCompatActivity {
 
         int channel_aplha, channel_red, channel_green, channel_blue;
         int pixel;
+
 
         for(int x = 0;x<width;x++){
             for(int y = 0;y<height;y++){
@@ -286,7 +219,7 @@ public class DetailPicture extends AppCompatActivity {
             }
 
         } catch (Exception e) {
-            Toast.makeText(this, "No s'ha pogut mostrar la imatge", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, this.getString(R.string.error_show_image), Toast.LENGTH_LONG).show();
             e.printStackTrace();
         }
     }
@@ -297,13 +230,14 @@ public class DetailPicture extends AppCompatActivity {
         int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
         cursor.moveToFirst();
         String result = cursor.getString(column_index);
+        Log.d(TAG,result);
         cursor.close();
         return result;
     }
 
     public Bitmap getBitmap(Uri path){
 
-        InputStream is = null;
+        InputStream is;
         try{
             final int IMAGE_MAX_SIZE = 1200000;
             is = getContentResolver().openInputStream(path);
@@ -317,9 +251,9 @@ public class DetailPicture extends AppCompatActivity {
             while((bmfOptions.outWidth * bmfOptions.outHeight)*(1/Math.pow(scale, 2)) > IMAGE_MAX_SIZE){
                 scale ++;
             }
-            Log.d("Info scale", "scale = " + scale + ", orig-with; " + bmfOptions.outWidth + ", orig-height: "+ bmfOptions.outHeight);
+            Log.d("InfoScale", "scale = " + scale + ", orig-with; " + bmfOptions.outWidth + ", orig-height: "+ bmfOptions.outHeight);
 
-            Bitmap b = null;
+            Bitmap b;
             is = getContentResolver().openInputStream(path);
             if(scale > 1){
                 scale--;
@@ -330,7 +264,7 @@ public class DetailPicture extends AppCompatActivity {
 
                 int height = b.getHeight();
                 int width = b.getWidth();
-                Log.d("sheet", "1th scale operation dimensions- width: " + width + ", height: " + height);
+                Log.d("InfoScale", "1th scale operation dimensions- width: " + width + ", height: " + height);
                 double y = Math.sqrt(IMAGE_MAX_SIZE / (((double)width)/height));
                 double x = (y/height) * width;
 
@@ -338,7 +272,7 @@ public class DetailPicture extends AppCompatActivity {
 
                 b.recycle();
                 b = scaledBitmap;
-                imageView.setRotation(90);
+                //imageView.setRotation(90);
 
 
             }else{
@@ -393,15 +327,7 @@ public class DetailPicture extends AppCompatActivity {
         return 0;
     }
 
-    public void onGetLumFromImage(View v){
-        ArrayList<Integer> rgba;
-        Bitmap src = ((BitmapDrawable)imageView.getDrawable()).getBitmap();
 
-        rgba = ProcessImage.getLumFromImage(src);
-        Luminance lum = new Luminance(rgba);
-        sp.addLuminance(this,lum);
-        Toast.makeText(this,"lum added",Toast.LENGTH_LONG).show();
-    }
 
     public void onGetLumFromImage(){
         ProcessImage processImage = new ProcessImage();
@@ -409,7 +335,7 @@ public class DetailPicture extends AppCompatActivity {
         Bitmap src = ((BitmapDrawable)imageView.getDrawable()).getBitmap();
         Mat imageMat = convertBitmap2Mat(src);
         rgba = processImage.getLumFromImage(imageMat);
-        Luminance lum = new Luminance(rgba);
+        Luminance lum = new Luminance(rgba,this);
         Intent addLum = new Intent(this,AddLuminance.class);
         addLum.putExtra("code",20);
         addLum.putExtra("Lum",lum);
@@ -424,16 +350,14 @@ public class DetailPicture extends AppCompatActivity {
         if (requestCode == SELECT_EFFECT) {
             if(resultCode == Activity.RESULT_OK){
                 effect= (Luminance) data.getSerializableExtra("result");
-
-
             }
             if (resultCode == Activity.RESULT_CANCELED) {
-                Toast.makeText(this,"no s'ha pogut seleccionar l'effecte", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this,this.getString(R.string.error_selec_effect), Toast.LENGTH_SHORT).show();
             }
         }else if(requestCode == ADD_LUM){
             Luminance lum = (Luminance) data.getSerializableExtra("result");
             sp.addLuminance(this,lum);
-            Toast.makeText(this,"Lum Added",Toast.LENGTH_LONG).show();
+            Toast.makeText(this,this.getString(R.string.lum_added),Toast.LENGTH_LONG).show();
         }
     }
 
@@ -445,6 +369,53 @@ public class DetailPicture extends AppCompatActivity {
         return true;
     }
 
+    private void onSaveImage(){
+        FileOutputStream out = null;
+        String filename = getFileName();
+        Bitmap bmp = bmpInput;
+        File sd = new File(Environment.getExternalStorageDirectory() + "/SMApp");
+        boolean succes = true;
+        if(!sd.exists()){
+            succes = sd.mkdir();
+            Log.d(TAG,"crear directori " + succes);
+        }
+        if(succes){
+
+            File dest = new File(sd,filename);
+
+            try{
+                out = new FileOutputStream(dest);
+                bmp.compress(Bitmap.CompressFormat.PNG,100,out);
+
+            }catch(Exception e){
+                e.printStackTrace();
+                Log.d(TAG,e.getMessage());
+            }finally {
+                try{
+                    if(out != null){
+                        out.close();
+                        Log.d(TAG,"Succes in saving the image");
+                        Toast.makeText(this,this.getString(R.string.save_image_detail_picture),Toast.LENGTH_LONG).show();
+
+                    }
+                } catch (IOException e){
+                    Log.d(TAG,e.getMessage() + "Error");
+                    e.printStackTrace();
+                }
+            }
+        }else{
+            Log.d(TAG,"error al guardar la imatge");
+        }
+
+    }
+    private String getFileName()
+    {
+        String timeStamp = new SimpleDateFormat("ddMMyyyy_HHmmss").format(new Date());
+        String imageFileName = "PNG_" + timeStamp + ".png";
+
+
+        return imageFileName;
+    }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
@@ -454,13 +425,19 @@ public class DetailPicture extends AppCompatActivity {
                 onClickProcess();
                 return true;
             case R.id.action_add_luminance:
-                onAddEffect();
+                if(effect == null){
+                    Toast.makeText(this,this.getString(R.string.select_lum_first),Toast.LENGTH_LONG).show();
+                }else{
+                    onAddEffect();
+                }
+
                 return true;
             case R.id.action_select_lum:
                 onSelectEffect();
                 return true;
 
             case R.id.action_save_image:
+                onSaveImage();
                 return true;
             case R.id.action_get_luminance:
                 onGetLumFromImage();

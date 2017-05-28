@@ -51,7 +51,7 @@ public class ListLuminance extends AppCompatActivity {
                     if (codeIntent == LIST_LUM) {
                         startAddLuminance(lum);
                     } else if (codeIntent == USE_EFFECT) {
-                        Log.i(TAG, "dintre seleccionar effecte");
+
                         getLuminance(lum);
 
                     }
@@ -105,7 +105,7 @@ public class ListLuminance extends AppCompatActivity {
                     if (codeIntent == LIST_LUM) {
                         startAddLuminance(lum);
                     } else if (codeIntent == USE_EFFECT) {
-                        Log.i(TAG, "dintre seleccionar effecte");
+
                         getLuminance(lum);
 
                     }

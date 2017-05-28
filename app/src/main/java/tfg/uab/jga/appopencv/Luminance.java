@@ -1,9 +1,12 @@
 package tfg.uab.jga.appopencv;
 
 
+import android.content.Context;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Random;
+
 
 public class Luminance implements Serializable{
     private int id;
@@ -15,14 +18,14 @@ public class Luminance implements Serializable{
         super();
     }
 
-    public Luminance(ArrayList<Integer> rgba){
+    public Luminance(ArrayList<Integer> rgba, Context context){
         this.red = rgba.get(0);
         this.green = rgba.get(1);
         this.blue = rgba.get(2);
         this.alpha = rgba.get(3);
         Random r = new Random();
         this.id = r.nextInt();
-        this.name = "Fet des de DetailPicture";
+        this.name = context.getString(R.string.lum_from_image);
     }
 
     public Luminance(int id, String name, int red, int green, int blue, int alpha){

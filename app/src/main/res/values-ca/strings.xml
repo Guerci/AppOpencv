@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AppOpencv</string>
+    <string name="Instruc_text">Afageix els valors RGB (0-255)</string>
+    <string name="Red">Vermell:</string>
+    <string name="add_luminance">Afegir il·luminació</string>
+    <string name="add_luminance_menu">Afegir Il·luminació</string>
+    <string name="alpha">Alfa:</string>
+    <string name="blue">Blau:</string>
+    <string name="camera">Càmera</string>
+    <string name="gallery">Galeria</string>
+    <string name="get_luminance">Obtenir il·luminació</string>
+    <string name="green">Verd:</string>
+    <string name="luminance_list">Llista d\'il·luminacions</string>
+    <string name="name_lum">Nom:</string>
+    <string name="process_image">Processar Imatge</string>
+    <string name="remove_lum">Eliminar</string>
+    <string name="save_image">Guardar Imatge</string>
+    <string name="save_lum">Guardar</string>
+    <string name="select_leng">Idioma</string>
+    <string name="select_luminance">Seleccionar Il·luminació</string>
+    <string name="take_photo">Foto</string>
+    <string name="lum_edited">Il·luminació editada</string>
+    <string name="lum_added">Il·luminació afegida</string>
+    <string name="lum_removed">Il·luminació eliminada</string>
+    <string name="error_show_image">La imatge no s\'ha pogut mostrar</string>
+    <string name="error_selec_effect">No s\'ha pogut seleccionar la il·luminació</string>
+    <string name="save_image_detail_picture">Imatge guardada</string>
+    <string name="select_lum_first">Seleccionar una il·luminació primer</string>
+    <string name="lum_from_image">Afegida desde una imatge</string>
+</resources>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AppOpencv</string>
+    <string name="alpha">Alfa:</string>
+    <string name="blue">Azul:</string>
+    <string name="cámera">Camera</string>
+    <string name="gallery">Galeria</string>
+    <string name="get_luminance">Obtener Iluminación</string>
+    <string name="green">Verde:</string>
+    <string name="luminance_list">Lista de iluminaciones</string>
+    <string name="name_lum">Nombre:</string>
+    <string name="process_image">Procesar Imagen</string>
+    <string name="remove_lum">Eliminar</string>
+    <string name="save_image">Guardar Imagen</string>
+    <string name="save_lum">Guardar</string>
+    <string name="select_leng">Lenguaje</string>
+    <string name="select_luminance">Seleccionar Iluminación</string>
+    <string name="take_photo">Foto</string>
+    <string name="Instruc_text">Añada los valores RGB (0-255)</string>
+    <string name="Red">Rojo:</string>
+    <string name="add_luminance">Añadair iluminación</string>
+    <string name="add_luminance_menu">Añadir Iluminación</string>
+    <string name="lum_edited">Iluminación editada</string>
+    <string name="lum_added">Iluminación añadida</string>
+    <string name="lum_removed">Iluminación eliminada</string>
+    <string name="error_show_image">No se ha podido mostrar la imagen</string>
+    <string name="error_selec_effect">No se ha podido seleccionar la iluminación</string>
+    <string name="save_image_detail_picture">Imagen guardada</string>
+    <string name="select_lum_first">Seleccione primero una iluminación</string>
+    <string name="lum_from_image">Añadida desde una imagen</string>
+</resources>

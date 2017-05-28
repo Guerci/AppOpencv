@@ -1,10 +1,31 @@
 <resources>
     <string name="app_name">AppOpencv</string>
-    <string name="title_activity_camera">CameraActivity</string>
-    <string name="add_luminance">add luminance</string>
+    <string name="title_activity_camera" translatable="false">CameraActivity</string>
+    <string name="add_luminance">Add luminance</string>
     <string name="process_image">Process Image</string>
     <string name="select_luminance">Select Luminance</string>
     <string name="add_luminance_menu">Add Luminance</string>
     <string name="save_image">Save Image</string>
     <string name="get_luminance">Get luminance</string>
+    <string name="Red">Red:</string>
+    <string name="Instruc_text">Add RGB colors within 0 to 255</string>
+    <string name="green">Green:</string>
+    <string name="blue">Blue:</string>
+    <string name="name_lum">Name:</string>
+    <string name="alpha">Alpha:</string>
+    <string name="save_lum">Save</string>
+    <string name="remove_lum">Remove</string>
+    <string name="take_photo">Photo</string>
+    <string name="gallery">Gallery</string>
+    <string name="luminance_list">Luminance list</string>
+    <string name="select_leng">Leguage</string>
+    <string name="camera">Camera</string>
+    <string name="lum_edited">Luminance edited</string>
+    <string name="lum_added">Luminance added</string>
+    <string name="lum_removed">Luminance removed</string>
+    <string name="error_show_image">Image could not be displayed</string>
+    <string name="error_selec_effect">Luminance couldn\'t be selected</string>
+    <string name="save_image_detail_picture">Image saved</string>
+    <string name="select_lum_first">Select luminance first</string>
+    <string name="lum_from_image">Added from image</string>
 </resources>
