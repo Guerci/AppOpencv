@@ -24,6 +24,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import org.opencv.android.Utils;
+import org.opencv.core.Core;
 import org.opencv.core.CvException;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
@@ -38,6 +39,7 @@ import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import static org.opencv.imgproc.Imgproc.cvtColor;
 
@@ -100,6 +102,58 @@ public class DetailPicture extends AppCompatActivity {
         startActivityForResult(getEffect,SELECT_EFFECT);
     }
 
+    public void onAddEffectMat(){
+
+
+        Bitmap imageBmp = bmpInput;
+        Mat image = convertBitmap2Mat(imageBmp);
+
+        if(image.type() != CvType.CV_64FC3){
+            image.convertTo(image,CvType.CV_64FC3);
+        }
+
+
+
+        Scalar divide = new Scalar(255,255,255);
+        Core.divide(image,divide,image);
+
+        Scalar rgb = new Scalar(effect.getBlue()/255.0,effect.getGreen()/255.0,effect.getRed()/255.0);
+        Core.multiply(image,rgb,image);
+
+
+
+
+        ArrayList<Mat> listMat = new ArrayList<>();
+        Core.split(image,listMat);
+        Core.MinMaxLocResult maxBlue = Core.minMaxLoc(listMat.get(0));
+        Core.MinMaxLocResult maxGreen = Core.minMaxLoc(listMat.get(1));
+        Core.MinMaxLocResult maxRed = Core.minMaxLoc(listMat.get(2));
+
+        double maxValor;
+        if(maxBlue.maxVal >= maxGreen.maxVal && maxBlue.maxVal >= maxRed.maxVal){
+            maxValor = maxBlue.maxVal;
+        }else if(maxGreen.maxVal >= maxRed.maxVal){
+            maxValor = maxGreen.maxVal;
+        }else{
+            maxValor = maxRed.maxVal;
+        }
+
+        Log.d(TAG,String.valueOf(maxValor));
+        Core.merge(listMat,image);
+        Scalar normalize = new Scalar(255.0/maxValor,255.0/maxValor,255.0/maxValor);
+        Log.d(TAG,"valor per normalitzar a 255: " + String.valueOf(255.0/maxValor));
+        Core.multiply(image,normalize,image);
+        image.convertTo(image,CvType.CV_8UC3);
+        Bitmap out = convertMat2Bitmap(image);
+
+
+        bmpInput = out;
+        imageView.setImageBitmap(out);
+
+
+
+
+    }
 
     public void onAddEffect(){
         int width = bmpInput.getWidth();
@@ -115,6 +169,7 @@ public class DetailPicture extends AppCompatActivity {
         int green = effect.getGreen();
         int blue = effect.getBlue();
         int depth = effect.getAlpha();
+
 
 
         int channel_aplha, channel_red, channel_green, channel_blue;
@@ -334,7 +389,7 @@ public class DetailPicture extends AppCompatActivity {
         ArrayList<Integer> rgba;
         Bitmap src = ((BitmapDrawable)imageView.getDrawable()).getBitmap();
         Mat imageMat = convertBitmap2Mat(src);
-        rgba = processImage.getLumFromImage(imageMat);
+        rgba = processImage.getLuminanceFromMat(imageMat);
         Luminance lum = new Luminance(rgba,this);
         Intent addLum = new Intent(this,AddLuminance.class);
         addLum.putExtra("code",20);
@@ -428,7 +483,7 @@ public class DetailPicture extends AppCompatActivity {
                 if(effect == null){
                     Toast.makeText(this,this.getString(R.string.select_lum_first),Toast.LENGTH_LONG).show();
                 }else{
-                    onAddEffect();
+                    onAddEffectMat();
                 }
 
                 return true;

@@ -21,9 +21,12 @@ import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import static java.lang.System.loadLibrary;
 
@@ -97,8 +100,7 @@ public class MainActivity extends AppCompatActivity {
        // startActivityForResult(loadAddLuminance,ADD_LUM);
         //startActivity(loadAddLuminance);*/
 
-        ProcessImage pi = new ProcessImage();
-        pi.test();
+        testMat();
     }
 
     @Override
@@ -120,5 +122,61 @@ public class MainActivity extends AppCompatActivity {
                 }
 
         }
+    }
+
+
+    public void testMat(){
+
+        Mat image = new Mat(5,5,CvType.CV_64FC3,new Scalar(5));
+        List<Mat> list = new ArrayList<>();
+        Core.split(image,list);
+        Core.add(list.get(1),new Scalar(2),list.get(1));
+        Core.add(list.get(2),new Scalar(1.5),list.get(2));
+        Core.merge(list,image);
+        Log.d(TAG,"Imatge inicial");
+        Log.d(TAG,image.dump());
+        Scalar divide = new Scalar(255,255,255);
+        Core.divide(image,divide,image);
+        //Core.normalize(image,image,0,1,Core.NORM_MINMAX);
+
+        Log.d(TAG,"Imatge normalitzada");
+        Log.d(TAG,image.dump());
+        Scalar rgb = new Scalar(150/255.0,90/255.0,95/255.0);
+        Log.d(TAG,"Scalar rgb");
+        Log.d(TAG,String.valueOf(rgb));
+        Core.multiply(image,rgb,image);
+        Log.d(TAG,"Imatge multiplicada per rgb");
+        Log.d(TAG,image.dump());
+
+        //Core.normalize(image,image,0,255,Core.NORM_MINMAX);
+
+
+        List<Mat> listMat = new ArrayList<>();
+        Core.split(image,listMat);
+        Core.MinMaxLocResult maxBlue = Core.minMaxLoc(listMat.get(0));
+        Core.MinMaxLocResult maxGreen = Core.minMaxLoc(listMat.get(1));
+        Core.MinMaxLocResult maxRed = Core.minMaxLoc(listMat.get(2));
+
+        double maxValor;
+        if(maxBlue.maxVal >= maxGreen.maxVal && maxBlue.maxVal >= maxRed.maxVal){
+            maxValor = maxBlue.maxVal;
+        }else if(maxGreen.maxVal >= maxRed.maxVal){
+            maxValor = maxGreen.maxVal;
+        }else{
+            maxValor = maxRed.maxVal;
+        }
+        Log.d(TAG,"Valor max normalitzat");
+        Log.d(TAG,String.valueOf(maxValor));
+
+
+        Core.merge(listMat,image);
+
+        Scalar normalize = new Scalar(255/maxValor,255/maxValor,255/maxValor);
+        Log.d(TAG,"scalar normalize");
+        Log.d(TAG,String.valueOf(normalize));
+        Core.multiply(image,normalize,image);
+        Log.d(TAG,"Imatge aa punt per pasar a bitmap");
+        Log.d(TAG,image.dump());
+
     }
 }
