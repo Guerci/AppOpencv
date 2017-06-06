@@ -99,7 +99,7 @@ public class ProcessImage {
 
         src.convertTo(src, CvType.CV_64FC3); //convert MAT to double precision with 3 channels
 
-        Scalar scalar = new Scalar(1.0/maxVal);
+        Scalar scalar = new Scalar(maxVal);
         Core.divide(src,scalar,src); //divide de Mat
         List<Mat> listRGB = new ArrayList<>();
         Core.split(src,listRGB);
@@ -565,8 +565,8 @@ public class ProcessImage {
         Core.multiply(modelList.get(1),saturatedPixels,modelList.get(1));
         Core.multiply(modelList.get(2),saturatedPixels,modelList.get(2));
 
-        //double centreSize = floor();
-        double centreSize = 0;
+
+        double centreSize = Math.floor(Math.min(image.rows(),image.cols()) * 0.01);
         if((centreSize % 2) == 0){
             centreSize --;
         }
@@ -612,13 +612,32 @@ public class ProcessImage {
     }
 
     private Mat dilation33(Mat in){
-        Mat dil = new Mat();
-        return dil;
+        double hh = in.rows();
+        double ll = in.cols();
+        Mat t = new Mat();
+        return t;
     }
 
     private Mat set_border(Mat in, double width){
-        Mat temp = new Mat(in.rows(),in.cols(),CvType.CV_64FC1,new Scalar(1));
-        return temp;
+
+        Mat temp = new Mat(in.rows(),in.cols(),in.type(),new Scalar(1));
+        for(int i = 0;i<temp.rows();i++){
+            for(int j = 0;j<temp.cols();j++){
+                if( i<width){
+                    temp.put(i,j,0);
+                }else if(i>= temp.rows() -width){
+                    temp.put(i,j,0);
+                }else if(j < width){
+                    temp.put(i,j,0);
+                }else if(j>= temp.cols() -width){
+                    temp.put(i,j,0);
+                }
+            }
+        }
+        Mat out = new Mat();
+        Core.multiply(temp,in,out);
+        return out;
+
     }
 
     private double PoolingHistMax(Mat in,double cutoof,boolean useaAveragePixels){
