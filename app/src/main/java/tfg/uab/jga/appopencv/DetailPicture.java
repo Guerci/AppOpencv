@@ -87,10 +87,10 @@ public class DetailPicture extends AppCompatActivity {
 
     public void onClickProcess(){
 
-        Toast.makeText(DetailPicture.this,"Yey",Toast.LENGTH_LONG);
-        matProcess  = convertBitmap2Mat(bmpInput);
-        matProcess = getProcess(matProcess);
-        bmpInput = convertMat2Bitmap(matProcess);
+        ProcessImage pi = new ProcessImage();
+        Mat image = convertBitmap2Mat(bmpInput);
+        image = pi.surroundModulation(image);
+        bmpInput = convertMat2Bitmap(image);
         imageView.setImageBitmap(bmpInput);
 
     }
@@ -155,61 +155,7 @@ public class DetailPicture extends AppCompatActivity {
 
     }
 
-    public void onAddEffect(){
-        int width = bmpInput.getWidth();
-        int height = bmpInput.getHeight();
 
-        Bitmap finalBitmap = Bitmap.createBitmap(width,height,bmpInput.getConfig());
-
-        final double grayScale_Red = 0.3;
-        final double grayScale_Green = 0.59;
-        final double grayScale_Blue = 0.11;
-
-        int red = effect.getRed();
-        int green = effect.getGreen();
-        int blue = effect.getBlue();
-        int depth = effect.getAlpha();
-
-
-
-        int channel_aplha, channel_red, channel_green, channel_blue;
-        int pixel;
-
-
-        for(int x = 0;x<width;x++){
-            for(int y = 0;y<height;y++){
-                pixel = bmpInput.getPixel(x,y);
-                channel_aplha = Color.alpha(pixel);
-                channel_red = Color.red(pixel);
-                channel_blue = Color.blue(pixel);
-                channel_green = Color.green(pixel);
-
-
-                channel_blue = channel_green = channel_red = (int)(grayScale_Red * channel_red + grayScale_Green *
-                        channel_green + grayScale_Blue * channel_blue);
-
-                channel_red += (depth * red);
-                if(channel_red> 255){
-                    channel_red = 255;
-                }
-                channel_blue += (depth * blue);
-                if(channel_blue> 255){
-                    channel_blue = 255;
-                }
-                channel_green += (depth * green);
-                if(channel_green> 255){
-                    channel_green = 255;
-                }
-
-                finalBitmap.setPixel(x,y,Color.argb(channel_aplha,channel_red,channel_green,channel_blue));
-
-            }
-        }
-
-
-        imageView.setImageBitmap(finalBitmap);
-
-    }
     Mat convertBitmap2Mat(Bitmap img){
 
         Mat rgbaMat = new Mat(img.getHeight(),img.getWidth(), CvType.CV_8UC4);
@@ -346,8 +292,7 @@ public class DetailPicture extends AppCompatActivity {
     }
 
     private Mat getProcess(Mat image){
-        int height = image.height();
-        int width = image.width();
+
         /*
         Mat imgGrey = new Mat(height,width,CvType.CV_8UC1);
         Imgproc.cvtColor(image,imgGrey,Imgproc.COLOR_RGB2GRAY);*/

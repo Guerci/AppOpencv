@@ -127,13 +127,17 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void testMat(){
-        int width = 512;
-        int x = 384;
-        int result = Math.min(width,x);
-        double r = result * 0.01;
-        double re = Math.floor(r);
-        Log.d(TAG,String.valueOf(re));
-
+        Mat t = new Mat(10,10,CvType.CV_64F);
+        for(int i = 0;i<10;i++){
+            for(int j= 0;j<10;j++){
+                t.put(i,j,0.1);
+            }
+        }
+        ProcessImage pi = new ProcessImage();
+        int[] a = new int[2];
+        a[0] = 0;
+        a[1] = 4;
+        pi.getContrastImage(t,a);
 
     }
 }
