@@ -137,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
         int[] a = new int[2];
         a[0] = 0;
         a[1] = 4;
-        pi.getContrastImage(t,a);
+       // pi.getContrastImage(t,a);
 
     }
 }
