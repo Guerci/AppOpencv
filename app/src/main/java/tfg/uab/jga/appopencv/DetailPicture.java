@@ -1,6 +1,7 @@
 package tfg.uab.jga.appopencv;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.database.Cursor;
@@ -86,12 +87,32 @@ public class DetailPicture extends AppCompatActivity {
 
 
     public void onClickProcess(){
+        final Bitmap[] out = new Bitmap[1];
+        final ProgressDialog progressDialog = new ProgressDialog(DetailPicture.this);
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.setTitle("Processing");
+        progressDialog.setMessage("Processing Image...");
+        progressDialog.setCancelable(false);
 
-        ProcessImage pi = new ProcessImage();
-        Mat image = convertBitmap2Mat(bmpInput);
-        image = pi.surroundModulation(image);
-        bmpInput = convertMat2Bitmap(image);
-        imageView.setImageBitmap(bmpInput);
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                ProcessImage pi = new ProcessImage();
+                Mat image = convertBitmap2Mat(bmpInput);
+                image = pi.surroundModulation(image);
+                out[0] = convertMat2Bitmap(image);
+                bmpInput = out[0];
+                progressDialog.dismiss();
+
+
+            }
+        });
+        t.start();
+        progressDialog.show();
+        if(!t.isAlive()){
+            imageView.setImageBitmap(out[0]);
+        }
+
 
     }
 

@@ -3,6 +3,7 @@ package tfg.uab.jga.appopencv;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Environment;
+import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -26,6 +27,7 @@ import org.opencv.imgproc.Imgproc;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
 
@@ -127,17 +129,21 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void testMat(){
-        Mat t = new Mat(10,10,CvType.CV_64F);
-        for(int i = 0;i<10;i++){
-            for(int j= 0;j<10;j++){
-                t.put(i,j,0.1);
-            }
-        }
+        /*
         ProcessImage pi = new ProcessImage();
-        int[] a = new int[2];
-        a[0] = 0;
-        a[1] = 4;
-       // pi.getContrastImage(t,a);
+        Long time = SystemClock.currentThreadTimeMillis();
+        double[] test = pi.linspace2(0.234,0.820,1000000);
+        Long time2 = SystemClock.currentThreadTimeMillis();
+        //Log.d(TAG, Arrays.toString(test));
+        Log.d(TAG,"Time: " + String.valueOf(time2-time));
+
+        time = SystemClock.currentThreadTimeMillis();
+        Mat t = pi.linspace(0.234,500,1000000);
+        time2 = SystemClock.currentThreadTimeMillis();
+        //Log.d(TAG,t.dump());
+        Log.d(TAG,"Time: " + String.valueOf(time2-time));
+        */
+
 
     }
 }
