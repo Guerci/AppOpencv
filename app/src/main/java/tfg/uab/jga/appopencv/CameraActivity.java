@@ -163,7 +163,7 @@ public class CameraActivity extends AppCompatActivity implements CameraBridgeVie
 
                     }
                 } catch (IOException e){
-                    Log.d(TAG,e.getMessage() + "Error");
+                    Log.d(TAG, "Error");
                     e.printStackTrace();
                 }
             }

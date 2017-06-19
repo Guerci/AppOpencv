@@ -107,14 +107,25 @@ public class DetailPicture extends AppCompatActivity {
 
             }
         });
-        t.start();
+
         progressDialog.show();
+
+        t.start();
+
+        try {
+            t.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         if(!t.isAlive()){
+            Log.d(TAG,"inside");
+
             imageView.setImageBitmap(out[0]);
         }
 
 
     }
+
 
 
     public void onSelectEffect(){
@@ -391,41 +402,45 @@ public class DetailPicture extends AppCompatActivity {
     }
 
     private void onSaveImage(){
+
         FileOutputStream out = null;
         String filename = getFileName();
         Bitmap bmp = bmpInput;
-        File sd = new File(Environment.getExternalStorageDirectory() + "/SMApp");
+        File sd = new File(Environment.getExternalStorageDirectory() + "/ASMApp");
         boolean succes = true;
         if(!sd.exists()){
             succes = sd.mkdir();
-            Log.d(TAG,"crear directori " + succes);
+
         }
         if(succes){
 
             File dest = new File(sd,filename);
 
             try{
+
                 out = new FileOutputStream(dest);
                 bmp.compress(Bitmap.CompressFormat.PNG,100,out);
 
             }catch(Exception e){
                 e.printStackTrace();
-                Log.d(TAG,e.getMessage());
+
             }finally {
+
                 try{
                     if(out != null){
                         out.close();
-                        Log.d(TAG,"Succes in saving the image");
+
                         Toast.makeText(this,this.getString(R.string.save_image_detail_picture),Toast.LENGTH_LONG).show();
 
                     }
                 } catch (IOException e){
-                    Log.d(TAG,e.getMessage() + "Error");
+
                     e.printStackTrace();
                 }
             }
         }else{
-            Log.d(TAG,"error al guardar la imatge");
+            Toast.makeText(this,"no s'ha pogut guardar la imatge",Toast.LENGTH_LONG).show();
+
         }
 
     }
