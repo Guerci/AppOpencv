@@ -102,18 +102,18 @@ public class ProcessImage {
         List<Mat> listMat = Arrays.asList(dowb,doyb,dorg); //BGR
         //Log.d(TAG,"doresponse");
         Mat dorespons = new Mat();
-        //Log.d(TAG,"red channel");
-        //Log.d(TAG,dorg.dump());
-        //Log.d(TAG,"green channel");
-        //Log.d(TAG,doyb.dump());
-        //Log.d(TAG,"blue channel");
-        //Log.d(TAG,dowb.dump());
+        /*Log.d(TAG,"red channel");
+        Log.d(TAG,dorg.dump());
+        Log.d(TAG,"green channel");
+        Log.d(TAG,doyb.dump());
+        Log.d(TAG,"blue channel");
+        Log.d(TAG,dowb.dump());*/
         Core.merge(listMat,dorespons);
 
 
         Scalar luminance = calculateLuminanceSingle(dorespons,inputImage);
 
-        //Log.d(TAG,"luminance: " + String.valueOf(luminance.val[0])+ String.valueOf(luminance.val[1])+ String.valueOf(luminance.val[2]));
+       // Log.d(TAG,"luminance: " + String.valueOf(luminance.val[0])+" "+ String.valueOf(luminance.val[1])+" "+ String.valueOf(luminance.val[2]));
         double sumluminance = luminance.val[2] +luminance.val[1]+luminance.val[0]; //sum of the values
         //divide each value per sum of all values
         double[] luminancedouble = {0.0,0.0,0.0};
@@ -125,17 +125,17 @@ public class ProcessImage {
 
         Mat colourConstantImage = matChansMulK(src,luminancedouble); //mutiplicamos cada canal por su luminance
 
-        ///Log.d(TAG,"coloutConstantImage after marchansmulk");
-        //Mat temp = colourConstantImage;
-       /* List<Mat> li = new ArrayList<>();
-        Core.split(temp,li);
+        //Log.d(TAG,"coloutConstantImage after marchansmulk");
+        Mat temp = colourConstantImage;
+        List<Mat> lis = new ArrayList<>();
+        Core.split(temp,lis);
 
-        Log.d(TAG,"blue");
-        Log.d(TAG,li.get(0).dump());
-        Log.d(TAG,"green");
-        Log.d(TAG,li.get(1).dump());
-        Log.d(TAG,"red");
-        Log.d(TAG,li.get(2).dump());*/
+        //Log.d(TAG,"red");
+        //Log.d(TAG,lis.get(2).dump());
+        //Log.d(TAG,"green");
+        //Log.d(TAG,lis.get(1).dump());
+        //Log.d(TAG,"blue");
+        //Log.d(TAG,lis.get(0).dump());
         //cogemos el max de la matrix
 
         ArrayList<Mat> list = new ArrayList<>();
@@ -163,14 +163,14 @@ public class ProcessImage {
         Mat t = colourConstantImage;
         List<Mat> li = new ArrayList<>();
         Core.split(t,li);
-/*
-        Log.d(TAG,"blue");
-        Log.d(TAG,li.get(0).dump());
-        Log.d(TAG,"green");
-        Log.d(TAG,li.get(1).dump());
-        Log.d(TAG,"red");
-        Log.d(TAG,li.get(2).dump());
-*/
+
+        //Log.d(TAG,"blue");
+        //Log.d(TAG,li.get(0).dump());
+        //Log.d(TAG,"green");
+        //Log.d(TAG,li.get(1).dump());
+        //Log.d(TAG,"red");
+        //Log.d(TAG,li.get(2).dump());
+
 
         colourConstantImage.convertTo(colourConstantImage,CvType.CV_8UC3);
 
@@ -183,7 +183,7 @@ public class ProcessImage {
 
 
     private Mat applyOneChannel(Mat isignal){
-        Log.d(TAG,"start applyOneChannel");
+        //Log.d(TAG,"start applyOneChannel");
         double centreSize = 3.0;
         double gaussianSigma = 1.5;
         double contrastEnlarge = 2.0;
@@ -200,8 +200,8 @@ public class ProcessImage {
         //Log.d(TAG,rgc.dump());
 
         Mat rgs = st.getSigmaSurround();
-       // Log.d(TAG,"rgs");
-       // Log.d(TAG,rgs.dump());
+        //Log.d(TAG,"rgs");
+        //Log.d(TAG,rgs.dump());
 
         Scalar mrgc = Core.mean(rgc);
         Scalar mrgs = Core.mean(rgs);
@@ -210,9 +210,9 @@ public class ProcessImage {
         c4 = c4 + mrgs.val[0];
         Mat ab = SingleContrast(isignal,gaussianSigma,contrastEnlarge,nk);
         //Log.d(TAG,"ab");
-        //Log.d(TAG,ab.dump());
+       // Log.d(TAG,ab.dump());
         Mat ba = SingleGaussian(isignal,gaussianSigma*surroundEnlarge);
-        //Log.d(TAG,"ba");
+       // Log.d(TAG,"ba");
         //Log.d(TAG,ba.dump());
 
         double[] ss = linspace(s1,s4,nk);
@@ -226,14 +226,14 @@ public class ProcessImage {
         Mat dorg = applyNeighbourInpact(isignal,ab,ba,ss,cs);
         //Log.d(TAG,"dorg");
         //Log.d(TAG,dorg.dump());
-        Log.d(TAG,"end applyOneChannel");
+        //Log.d(TAG,"end applyOneChannel");
         return dorg;
 
     }
 
     private SigmaTemplate relativePixelContrast(Mat inputImage, double centreSize, double surroundSize){
 
-        Log.d(TAG,"Start relativePixelContrast");
+        //Log.d(TAG,"Start relativePixelContrast");
         Scalar oneScalar = new Scalar(1);
         Mat hc = new Mat((int)centreSize,(int)centreSize,CvType.CV_64FC1,oneScalar);
         Mat hs = new Mat ((int)surroundSize,(int) surroundSize,CvType.CV_64FC1,oneScalar);
@@ -271,7 +271,7 @@ public class ProcessImage {
         //Log.d(TAG,SigmaSurround.dump());
 
         SigmaTemplate st = new SigmaTemplate(SigmaCentre,SigmaSurround);
-        Log.d(TAG,"end relativepixelcontrast");
+        //Log.d(TAG,"end relativepixelcontrast");
         return st;
 
 
@@ -320,8 +320,8 @@ public class ProcessImage {
     }
 
 
-    private Mat SingleContrast(Mat isignal,double startingsigma, double contrastenlarge, double nContrastLevels){
-        Log.d(TAG,"Start SingleContrast");
+    private Mat SingleContrast(Mat isignal, double startingsigma, double contrastenlarge, double nContrastLevels){
+        //Log.d(TAG,"Start SingleContrast");
         double rows = isignal.rows();
         double cols = isignal.cols();
         int[] arg1 = new int[2];
@@ -332,28 +332,34 @@ public class ProcessImage {
         arg2[1] = 17;
         Mat contrastImx = getContrastImage(isignal, arg1);
         Mat contrastImy = getContrastImage(isignal,arg2);
-        //Log.d(TAG,"contrastImx");
-        //Log.d(TAG,contrastImx.dump());
-        //Log.d(TAG,"contrastimY");
-        //Log.d(TAG,contrastImy.dump());
+
 
         double finishSigma = startingsigma * contrastenlarge;
         double[] sigmas = linspace(startingsigma,finishSigma,nContrastLevels);
-        //Log.d(TAG,"Sigmas");
-        //Log.d(TAG,Arrays.toString(sigmas));
+
         Mat contrastLevelX = getContrastLevels(contrastImx,nContrastLevels);
-       // Log.d(TAG,"type: " +String.valueOf(contrastLevelX.type()));
+
         contrastLevelX.convertTo(contrastLevelX,CvType.CV_32S);
         Mat contrastLevelY = getContrastLevels(contrastImy,nContrastLevels);
         contrastLevelY.convertTo(contrastLevelY,CvType.CV_32S);
         //Log.d(TAG,"contrastLevelX");
-       // Log.d(TAG,contrastLevelX.dump());
-       // Log.d(TAG,"contrastLevelY");
-       // Log.d(TAG,contrastLevelY.dump());
-        double[] nContrastLevelsX = unique(contrastLevelX);
-        //Log.d(TAG,"nContrastLevelX" + Arrays.toString(nContrastLevelsX));
-        double[] nContrastLevelY = unique(contrastLevelY);
-        //Log.d(TAG,"nContrastLevelY" + Arrays.toString(nContrastLevelY));
+        //Log.d(TAG,contrastLevelX.dump());
+        //Log.d(TAG,"contrastLevelY");
+        //Log.d(TAG,contrastLevelY.dump());
+        //double[] nContrastLevelsX = unique(contrastLevelX);
+        double[] nContrastLevelsX = new double[4];
+        nContrastLevelsX[0] = 1.0;
+        nContrastLevelsX[1] = 2.0;
+        nContrastLevelsX[2]= 3.0;
+        nContrastLevelsX[3] = 4.0;
+        Log.d(TAG,"nContrastLevelX" + Arrays.toString(nContrastLevelsX));
+        //double[] nContrastLevelY = unique(contrastLevelY);
+        double[] nContrastLevelY = new double[4];
+        nContrastLevelY[0] = 1.0;
+        nContrastLevelY[1] = 2.0;
+        nContrastLevelY[2]= 3.0;
+        nContrastLevelY[3] = 4.0;
+        Log.d(TAG,"nContrastLevelY" + Arrays.toString(nContrastLevelY));
         Mat rfresponse = new Mat((int)rows,(int)cols,CvType.CV_64FC1,new Scalar(0));
 
         double lambdaxi;
@@ -361,50 +367,45 @@ public class ProcessImage {
 
         Point anchor = new Point(-1,-1);
         double delta = 0;
-        double[] cx;
-        double[] cy;
-        double[] fr;
+
+        Scalar iS = new Scalar(0);
+        Scalar jS = new Scalar(0);
+        Mat maskX = new Mat();
+        Mat maskY = new Mat();
+        Mat mask = new Mat();
         for (double i: nContrastLevelsX) {
             lambdaxi = sigmas[(int)i-1];
+            iS.val[0] = i;
+            Core.compare(contrastLevelX,iS,maskX,Core.CMP_EQ);
             for (double j:nContrastLevelY) {
                 lambdayi = sigmas[(int)i-1];
 
                 Mat rfi = GaussianFilter2(lambdaxi,lambdayi,0,0);
-
+                //Log.d(TAG,"rfi");
+                //Log.d(TAG,rfi.dump());
                 Mat fresponsei = new Mat();
-                Imgproc.filter2D(isignal,fresponsei,-1,rfi,anchor,delta,Core.BORDER_DEFAULT );
+                Imgproc.filter2D(isignal,fresponsei,-1,rfi,anchor,delta,Core.BORDER_REPLICATE );
                 //Log.d(TAG,"fresponsei");
                 //Log.d(TAG,fresponsei.dump());
 
-                for(int x=0;x<rfresponse.rows();x++){
-                    for(int y=0;y<rfresponse.cols();y++){
-
-                        cx = contrastLevelX.get(x,y);
-                        //contrastLevelX.get(x,y,cx);
-                        cy = contrastLevelY.get(x,y);
-
-                        //contrastLevelY.get(x,y,cy);
-                        if(i == cx[0] && j == cy[0]){
-                            fr = fresponsei.get(x,y);
-                            //fresponsei.get(x,y,fr);
-                            rfresponse.put(x,y,fr);
-                        }
-                    }
-
-                }
+                jS.val[0] = j;
+                Core.compare(contrastLevelY,jS,maskY,Core.CMP_EQ);
+                Core.compare(maskX,maskY,mask,Core.CMP_EQ);
+                //rfresponse.setTo(fresponsei,mask);
+                fresponsei.copyTo(rfresponse,mask);
 
             }
             
         }
         //Log.d(TAG,"rfresponse");
         //Log.d(TAG,rfresponse.dump());
-        Log.d(TAG,"end singlecontrast");
+        //Log.d(TAG,"end singlecontrast");
         return rfresponse;
 
     }
 
     public double[] linspace(double d1,double d2, double n){
-        Log.d(TAG,"Start linspace");
+        //Log.d(TAG,"Start linspace");
         n = Math.floor(n);
         double n1 = n -1;
         double step = d2-d1;
@@ -417,14 +418,14 @@ public class ProcessImage {
             y[i] = d1+step*i;
 
         }
-        Log.d(TAG,"end linspace");
+        //Log.d(TAG,"end linspace");
         return y;
     }
 
 
 
     private Mat getContrastLevels(Mat contrastIm, double nContrastLevels){
-        Log.d(TAG,"Start getContrastlevel");
+        //Log.d(TAG,"Start getContrastlevel");
         Core.MinMaxLocResult minMaxLocResult =Core.minMaxLoc(contrastIm);
         double min = minMaxLocResult.minVal;
 
@@ -439,36 +440,40 @@ public class ProcessImage {
             i = i+step;
             levels.add(i);
         }
-
+        //Log.d(TAG,"contrastIm");
+        //Log.d(TAG,contrastIm.dump());
+        //Log.d(TAG,"levels: " + levels);
         //int size = levels.size();
 
-
-        return imQuantize2(contrastIm,levels);
+        Mat resum = imQuantize2(contrastIm,levels);
+        return resum;
 
     }
 
 
 
     private Mat getContrastImage(Mat isignal, int[] surroundSize){
-        Log.d(TAG,"start getContrastImage");
-        double[] centreSize = new double[2];
-        centreSize[0] = 0;
-        centreSize[1] = 0;
+        //Log.d(TAG,"start getContrastImage");
 
-        Mat contrastStd = LocalstdContrast(isignal,surroundSize,centreSize);
+        //Log.d(TAG,"surroundSize: " + Arrays.toString(surroundSize));
 
+        Mat contrastStd = LocalstdContrast(isignal,surroundSize);
+        //Log.d(TAG,"contrastStd");
+        //Log.d(TAG,contrastStd.dump());
         Mat contrastImg = new Mat(contrastStd.rows(),contrastStd.cols(),contrastStd.type(),new Scalar(1.0));
 
         Mat out = new Mat(contrastStd.rows(),contrastStd.cols(),CvType.CV_64F);
         Core.subtract(contrastImg,contrastStd,out);
-        Log.d(TAG,"end getcontrastimage");
+        //Log.d(TAG,"contrast subtract");
+        //Log.d(TAG,contrastStd.dump());
+       // Log.d(TAG,"end getcontrastimage");
         return  out;
 
 
     }
 
     private double[] unique(Mat src){
-        Log.d(TAG,"Start unique");
+        //Log.d(TAG,"Start unique");
         ArrayList<Double> o = new ArrayList<>();
         if(src.type() != CvType.CV_32FC1){
             src.convertTo(src,CvType.CV_32FC1);
@@ -491,14 +496,14 @@ public class ProcessImage {
             out[i] = o.get(i);
         }
         Arrays.sort(out);
-        Log.d(TAG,"end unique");
+        //Log.d(TAG,"end unique");
         return out;
     }
 
 
 
     private Mat matChansMulK(Mat inputImage, double[] k){
-        Log.d(TAG,"Strat matChansMulK");
+        //Log.d(TAG,"Strat matChansMulK");
 
         List<Mat> listMat = new ArrayList<>();
         Core.split(inputImage,listMat);
@@ -518,7 +523,7 @@ public class ProcessImage {
         Mat out = new Mat();
 
         Core.merge(list,out);
-        Log.d(TAG,"end matCHans");
+        //Log.d(TAG,"end matCHans");
         return out;
 
     }
@@ -527,28 +532,40 @@ public class ProcessImage {
 
     private Mat SingleGaussian(Mat isignal,double startingSigma){
 
-        Log.d(TAG,"start singlGaussian");
+        //Log.d(TAG,"start singlGaussian");
         Point anchor = new Point(-1,-1);
         double delta = 0;
         //Mat rf = Imgproc.getGaussianKernel(1,startingSigma);
         Mat rf = GaussianFilter2(startingSigma,startingSigma,0,0);
 
         Mat response = new Mat();
-        Imgproc.filter2D(isignal,response,-1,rf,anchor,delta,Core.BORDER_DEFAULT);
+        Imgproc.filter2D(isignal,response,-1,rf,anchor,delta,Core.BORDER_REPLICATE);
         //Log.d(TAG,"result");
         //Log.d(TAG,response.dump());
-        Log.d(TAG,"end singlegaussian");
+        //Log.d(TAG,"end singlegaussian");
         return response;
     }
 
     private Mat applyNeighbourInpact(Mat isignal, Mat ab, Mat ba, double[] surroundImpacts, double[] centreImpacts){
-        Log.d(TAG,"start applyNeighbourInpact");
+        //Log.d(TAG,"start applyNeighbourInpact");
+        //Log.d(TAG,"surroundImpacts: " + Arrays.toString(surroundImpacts));
+       //Log.d(TAG,"centreImpats: " + Arrays.toString(centreImpacts));
+
         int nContrastLevels = surroundImpacts.length;
         int[] surroundSize = {17,17};
         Mat contrastImage = getContrastImage(isignal,surroundSize);
+        //Log.d(TAG,"contarstImage");
+        ///Log.d(TAG,contrastImage.dump());
         Mat contrastLevels = getContrastLevels(contrastImage,nContrastLevels);
-        double[] nconLevels = unique(contrastLevels);
-
+        //Log.d(TAG,"contrastLevels");
+        //Log.d(TAG,contrastLevels.dump());
+        //double[] nconLevels = unique(contrastLevels);
+        double[] nconLevels = new double[4];
+        nconLevels[0] = 1.0;
+        nconLevels[1] = 2.0;
+        nconLevels[2]= 3.0;
+        nconLevels[3] = 4.0;
+        Log.d(TAG,"unique; " + Arrays.toString(nconLevels));
         Scalar zero = new Scalar(0);
         Mat osignal = new Mat(isignal.rows(),isignal.cols(),isignal.type(),zero);
        // Log.d(TAG,"nconLevels: " + Arrays.toString(nconLevels));
@@ -586,7 +603,7 @@ public class ProcessImage {
 
             //demanar arash
         }
-        Log.d(TAG,"end applyneighbourinpact");
+        //Log.d(TAG,"end applyneighbourinpact");
         return osignal;
 
     }
@@ -594,7 +611,7 @@ public class ProcessImage {
 
 
     private Mat imQuantize2(Mat in, ArrayList<Double> levels){
-        Log.d(TAG,"start Imquantize");
+        //Log.d(TAG,"start Imquantize");
         Mat out = new Mat(in.rows(),in.cols(),in.type());
         Mat aux = new Mat(in.rows(),in.cols(),in.type());
 
@@ -611,59 +628,72 @@ public class ProcessImage {
                 Core.compare(in,rang,aux,Core.CMP_LE);
 
                 out.setTo(value,aux);
+
             }else if(i == size){
                 rang.val[0] = levels.get(size-1);
 
                 Core.compare(in,rang,aux,Core.CMP_GE);
+
                 value.val[0] = size+1;
 
                 out.setTo(value,aux);
+
 
             }else{
                 rangmen.val[0] = levels.get(i-1);
                 rangmaj.val[0] = levels.get(i);
                 Core.inRange(in,rangmen,rangmaj,aux);
-                value.val[0] = i+2;
+
+                value.val[0] = i+1;
 
                 out.setTo(value,aux);
+
             }
         }
-        //Log.d(TAG,"out");
-        //Log.d(TAG,out.dump());
-        Log.d(TAG,"end imquantize");
+
+        //Log.d(TAG,"end imquantize");
         return out;
     }
 
-    private Mat LocalstdContrast(Mat inputImage, int[] windowSize, double[] centreSize){
-        Log.d(TAG,"strat LocalstdContrast");
+    private Mat LocalstdContrast(Mat inputImage, int[] windowSize){
+        //Log.d(TAG,"strat LocalstdContrast");
 
         Mat kernel = new Mat(windowSize[0],windowSize[1],CvType.CV_64F);
-        kernel.setTo(new Scalar(0.0588));
-        Point anchor = new Point(centreSize[0],centreSize[1]);
+        if(windowSize[0] == 17 && windowSize[1] == 17){
+            kernel.setTo(new Scalar(0.0035));
+        }else if(windowSize[0] == 3){
+            kernel.setTo(new Scalar(0.1111));
+        }else{
+            kernel.setTo(new Scalar(0.0588));
+        }
+
+        //Point anchor = new Point(centreSize[0],centreSize[1]);//diria que es -1,-1
+        Point anchor = new Point(-1,-1);
+
        //Log.d(TAG,"centreSize: " + String.valueOf(centreSize[0])+ " "+String.valueOf(centreSize[1]));
-        Mat dest = new Mat(inputImage.rows(),inputImage.cols(),CvType.CV_64FC1);
-        //Imgproc.filter2D(inputImage,dest,inputImage.depth(),kernel);
-        Imgproc.filter2D(inputImage,dest,-1,kernel,anchor,0,Core.BORDER_DEFAULT);
-        //Log.d(TAG,"dest");
-        //Log.d(TAG,dest.dump());
+        Mat meanCentre = new Mat(inputImage.rows(),inputImage.cols(),CvType.CV_64FC1);
+
+        Imgproc.filter2D(inputImage,meanCentre,-1,kernel,anchor,0,Core.BORDER_REFLECT);
+        //Log.d(TAG,"meanCentre");
+        //Log.d(TAG,meanCentre.dump());
         Mat stdv = new Mat(inputImage.rows(),inputImage.cols(),inputImage.type());
-        Core.subtract(inputImage,dest,stdv);
+        Core.subtract(inputImage,meanCentre,stdv);
         //Log.d(TAG,"stdv");
         //Log.d(TAG,stdv.dump());
         Core.pow(stdv,2,stdv);
         //Log.d(TAG,"stdv pow");
         //Log.d(TAG,stdv.dump());
         Mat meanstdv = new Mat(inputImage.rows(),inputImage.cols(),inputImage.type());
-        Imgproc.filter2D(stdv,meanstdv,-1,kernel,anchor,0,Core.BORDER_DEFAULT);
+        Imgproc.filter2D(stdv,meanstdv,-1,kernel,anchor,0,Core.BORDER_REFLECT);
         Core.sqrt(meanstdv,meanstdv);
         //Log.d(TAG,"meanstdv");
         //Log.d(TAG,meanstdv.dump());
-        Log.d(TAG,"end localstdcontrast");
+        //Log.d(TAG,"end localstdcontrast");
         return meanstdv;
     }
 
     private Scalar calculateLuminanceSingle(Mat modelResponse, Mat image){
-        Log.d(TAG,"strat calculateLuminanceSingle");
+        //Log.d(TAG,"strat calculateLuminanceSingle");
         ArrayList<Mat> listMat = new ArrayList<>();
         Core.split(image,listMat);
         Core.MinMaxLocResult maxBlue = Core.minMaxLoc(listMat.get(0));
@@ -692,91 +722,83 @@ public class ProcessImage {
         Mat minImage = new Mat(image.rows(),image.cols(),CvType.CV_64FC1);
 
 
-        //Log.d(TAG,"Saturation Threshold: " + String.valueOf(SaturationThreshold) + " " + "Darkthreshold: " + String.valueOf(DarkThreshold));
-
-
         Core.max(listMat.get(0),listMat.get(1),maxImage);
         Core.max(maxImage,listMat.get(2),maxImage);
 
         Core.min(listMat.get(0),listMat.get(1),minImage);
         Core.min (minImage,listMat.get(2),minImage);
-        //Log.d(TAG,"maxImage");
-        //Log.d(TAG,maxImage.dump());
-        ////Log.d(TAG,"minImage");
-        //Log.d(TAG,minImage.dump());
-
-
 
         Mat maskMax = new Mat();
         Imgproc.threshold(maxImage,maskMax,SaturationThreshold-1,1.0,Imgproc.THRESH_BINARY);
-        //Log.d(TAG,"maskMax");
-        //Log.d(TAG,maskMax.dump());
+
         Mat minMask = new Mat();
         Imgproc.threshold(minImage,minMask,DarkThreshold,1.0,Imgproc.THRESH_BINARY_INV);
-        //Log.d(TAG,"minMask");
-        //Log.d(TAG,minMask.dump());
+
         Mat dilMat = new Mat(image.rows(),image.cols(),CvType.CV_8U,new Scalar(0));
 
-        //Log.d(TAG,"rows: " + String.valueOf(dilMat.rows())+" cols: "+String.valueOf(dilMat.cols()));
         Scalar v = new Scalar(1);
+
         dilMat.setTo(v,minMask);
-        //Log.d(TAG,"mi");
-        //Log.d(TAG,dilMat.dump());
         dilMat.setTo(v,maskMax);
 
-
         Mat saturatedPixels = dilation33(dilMat);
-        //Log.d(TAG,"saturedPixels");
-        //Log.d(TAG,saturatedPixels.dump());
+
 
         Mat masks = new Mat();
         Core.compare(saturatedPixels,new Scalar(0),masks,Core.CMP_EQ);
 
         Mat s = new Mat(saturatedPixels.rows(),saturatedPixels.cols(),saturatedPixels.type(),new Scalar(0));
         s.setTo(v,masks);
-        //Log.d(TAG,"satruedPixels");
-        //Log.d(TAG,s.dump());
+
 
         double sigma = 2;
         saturatedPixels = set_border(s,sigma +1);
-        //Log.d(TAG,"saruedPixels");
-        //Log.d(TAG,saturatedPixels.dump());
+
         List<Mat> modelList = new ArrayList<Mat>();
+
         Core.split(modelResponse,modelList);
-
-
         saturatedPixels.convertTo(saturatedPixels,CvType.CV_32F);
+
+
         //primer canal
         Mat src = modelList.get(0);
         src.convertTo(src,CvType.CV_32F);
+        //Log.d(TAG,"src");
+        //Log.d(TAG,src.dump());
+
         Mat mask = new Mat(src.rows(),src.cols(),src.type());
         Imgproc.threshold(src,mask,0.0,1.0,Imgproc.THRESH_BINARY);
         Core.multiply(src,mask,src);
+
         Core.multiply(src,saturatedPixels,src);
+
         modelList.set(0,src);
+
         //segon canal
         src = modelList.get(1);
         src.convertTo(src,CvType.CV_32F);
         mask = new Mat(src.rows(),src.cols(),src.type());
         Imgproc.threshold(src,mask,0.0,1.0,Imgproc.THRESH_BINARY);
+
         Core.multiply(src,mask,src);
+
         Core.multiply(src,saturatedPixels,src);
+
         modelList.set(1,src);
+
 
         //tecer canal
         src = modelList.get(2);
         src.convertTo(src,CvType.CV_32F);
         mask = new Mat(src.rows(),src.cols(),src.type());
         Imgproc.threshold(src,mask,0.0,1.0,Imgproc.THRESH_BINARY);
+
         Core.multiply(src,mask,src);
+
         Core.multiply(src,saturatedPixels,src);
+
         modelList.set(2,src);
-/*
-        Log.d(TAG,"modelResponse");
-        Log.d(TAG,modelList.get(0).dump());
-        Log.d(TAG,modelList.get(1).dump());
-        Log.d(TAG,modelList.get(2).dump());
-*/
+
 
         double centreSize = Math.floor(Math.min(image.rows(),image.cols()) * 0.01);
         if((centreSize % 2) == 0){
@@ -786,6 +808,7 @@ public class ProcessImage {
         if(centreSize<3){
             centreSize = 3;
         }
+        //Log.d(TAG,"centresize: " + String.valueOf(centreSize));
 
         Core.MinMaxLocResult modelResponseblue = Core.minMaxLoc(modelList.get(0));
         Core.MinMaxLocResult modelResponsegreen = Core.minMaxLoc(modelList.get(1));
@@ -806,11 +829,38 @@ public class ProcessImage {
         Scalar scalmaxmr = new Scalar(maxModelResponse,maxModelResponse,maxModelResponse);
         Core.merge(modelList,modelResponse);
         Core.divide(modelResponse,scalmaxmr,modelResponse);
-        double[] cs = {centreSize,centreSize};
-        int[] ws = {5,5};
-        Mat stdImg = LocalstdContrast(modelResponse,ws, cs);
-        Scalar Cutoff = Core.mean(stdImg);
+
+        List<Mat> listLocalstdCentre = new ArrayList<Mat>();
+        Core.split(modelResponse,listLocalstdCentre);
+        int[] cs = {(int)centreSize,(int)centreSize};
+        //Log.d(TAG,"centreSize " + Arrays.toString(cs));
+
+
+        Mat stdImg = LocalstdContrast(listLocalstdCentre.get(0),cs);
+        listLocalstdCentre.set(0,stdImg);
+        //Log.d(TAG,"stdImg blue");
+        //Log.d(TAG,stdImg.dump());
+
+
+        stdImg = LocalstdContrast(listLocalstdCentre.get(1),cs);
+        listLocalstdCentre.set(1,stdImg);
+        //Log.d(TAG,"stdImg green");
+        //Log.d(TAG,stdImg.dump());
+
+        stdImg = LocalstdContrast(listLocalstdCentre.get(2),cs);
+        listLocalstdCentre.set(2,stdImg);
+        //Log.d(TAG,"stdImg red");
+        //Log.d(TAG,stdImg.dump());
+        Mat stdmodel = new Mat();
+        Core.merge(listLocalstdCentre,stdmodel);
+
+
+
+
+        Scalar Cutoff = Core.mean(stdmodel);
+        //Log.d(TAG,"Cutoff; " + String.valueOf(Cutoff.val[0])+" " + String.valueOf(Cutoff.val[1])+" "+String.valueOf(Cutoff.val[2]));
         double meanCutOff = (Cutoff.val[0]+Cutoff.val[1]+Cutoff.val[2])/3;
+        //Log.d(TAG,"meanCutOff " + String.valueOf(meanCutOff));
         Scalar normRGB = new Scalar(255,255,255);
         Core.multiply(modelResponse,normRGB,modelResponse);
 
@@ -825,11 +875,11 @@ public class ProcessImage {
         Log.d(TAG,listTmp.get(1).dump());
         Log.d(TAG,listTmp.get(2).dump());
 
-*/
+        */
         for(int i = 0;i<3;i++){
 
             valor = PoolingHistMax(listTmp.get(i),saturatedPixels,meanCutOff);
-            Log.d(TAG,"valor Pooling: " + String.valueOf(valor));
+            //Log.d(TAG,"valor Pooling: " + String.valueOf(valor));
             maxValors[i] = valor;
 
         }
@@ -837,49 +887,49 @@ public class ProcessImage {
 
 
         Scalar luminance = new Scalar(maxValors[0],maxValors[1],maxValors[2]);
-        Log.d(TAG,"end calculateLumiannceSingle");
+        //Log.d(TAG,"end calculateLumiannceSingle");
 
         return luminance;
     }
 
     private Mat dilation33(Mat in){
-        Log.d(TAG,"start dilation33");
-        double hh = in.rows();
-        double ll = in.cols();
+        //Log.d(TAG,"start dilation33");
+        int hh = in.rows();
+        int ll = in.cols();
         Scalar zero = new Scalar(0);
+        Scalar one = new Scalar(1);
         Mat out1chanel = new Mat(in.rows(),in.cols(),in.type(),zero);
         //menys primera fila, ultima fila igual que la ultima
-        double[] pixelsIn;
+        //Log.d(TAG,"in");
+        //Log.d(TAG,in.dump());
 
-        for(int i = 0;i<hh;i++){
-            for(int j = 0;j<ll;j++){
-                if(i == hh-1){
-                    pixelsIn = in.get(i,j);
-                    out1chanel.put(i,j,pixelsIn);
-                }else{
-                    pixelsIn = in.get(i+1,j);
-                    out1chanel.put(i,j,pixelsIn);
-                }
+        for (int i = 0;i<hh;i++){
+            if(i == hh-1){
+                in.row(i).copyTo(out1chanel.row(i));
+            }else{
+                in.row(i+1).copyTo(out1chanel.row(i));
             }
         }
+        //Log.d(TAG,"out1channel");
+        //Log.d(TAG,out1chanel.dump());
+
 
         Mat out12chanel = in; //igual al in
 
         Mat out13chanel = new Mat(in.rows(),in.cols(),in.type(),zero);
 
+
         //menys ultima fila, afegir primera fila igual que primera
 
-        for(int i = 0; i<hh; i++){
-            for(int j = 0; j<ll;j++){
-                if(i == 0){
-                    pixelsIn = in.get(i,j);
-                    out13chanel.put(i,j,pixelsIn);
-                }else{
-                    pixelsIn = in.get(i-1,j);
-                    out13chanel.put(i,j,pixelsIn);
-                }
-            }
-        }
+       for(int i = 0;i<hh;i++){
+           if(i == 0){
+               in.row(i).copyTo(out13chanel.row(i));
+           }else{
+               in.row(i-1).copyTo(out13chanel.row(i));
+           }
+       }
+        //Log.d(TAG,"out13channel");
+        //Log.d(TAG,out13chanel.dump());
 
         List<Mat> listout = new ArrayList();
         listout.add(out1chanel);
@@ -887,51 +937,41 @@ public class ProcessImage {
         listout.add(out13chanel);
         Mat out = new Mat();
         Core.merge(listout,out);
-        double[] pixels;
+
         Mat out2 = new Mat(in.rows(),in.cols(),in.type(),zero);
         //get max dels tres canals
-        for(int i = 0;i<hh;i++){
-            for(int j = 0;j<ll;j++){
-                pixels = out.get(i,j);
-                if(pixels[0] > pixels[1] && pixels[0] > pixels[2]){
-                    out2.put(i,j,pixels[0]);
-                }else if(pixels[1] >= pixels[2]){
-                    out2.put(i,j,pixels[1]);
-                }else{
-                    out2.put(i,j,pixels[2]);
-                }
-            }
-        }
+        Core.max(listout.get(0),listout.get(1),out2);
+        Core.max(out2,listout.get(2),out2);
 
         out1chanel.setTo(zero);
         out13chanel.setTo(zero);
 
+        //Log.d(TAG,"ou2");
+        //Log.d(TAG,out2.dump());
+
         //eliminar primer fila, ultima fila igual que ultima
-        for(int i = 0; i<hh;i++){
-            for(int j = 0; j<ll;j++){
-                if(j == ll-1){
-                    pixelsIn = out2.get(i,j);
-                    out1chanel.put(i,j,pixelsIn);
-                }else{
-                    pixelsIn = out2.get(i,j+1);
-                    out1chanel.put(i,j,pixelsIn);
-                }
+        for(int i = 0;i<ll;i++){
+            if(i == ll-1){
+                out2.col(i).copyTo(out1chanel.col(i));
+            }else{
+                out2.col(i+1).copyTo(out1chanel.col(i));
             }
+
         }
+        //Log.d(TAG,"out1channel");
+        //Log.d(TAG,out1chanel.dump());
 
         //eliminar ultima fila, primera fila igual primera
 
-        for(int i = 0;i<hh;i++){
-            for(int j = 0;j<ll;j++){
-                if(j == 0){
-                    pixelsIn = out2.get(i,j);
-                    out13chanel.put(i,j,pixelsIn);
-                }else{
-                    pixelsIn = out.get(i,j-1);
-                    out13chanel.put(i,j,pixelsIn);
-                }
+        for(int i = 0;i<ll;i++){
+            if(i == 0){
+                out2.col(i).copyTo(out13chanel.col(i));
+            }else{
+                out2.col(i-1).copyTo(out13chanel.col(i));
             }
         }
+        //Log.d(TAG,"out13channel");
+        //Log.d(TAG,out13chanel.dump());
 
         listout.clear();
         listout.add(out1chanel);
@@ -942,27 +982,17 @@ public class ProcessImage {
         Core.merge(listout,out3channels);
 
         Mat outDilation = new Mat(in.rows(),in.cols(),in.type());
-        for(int i = 0;i<hh;i++){
-            for(int j = 0;j<ll;j++){
-                pixels = out3channels.get(i,j);
-                if(pixels[0] > pixels[1] && pixels[0] > pixels[2]){
-                    outDilation.put(i,j,pixels[0]);
-                }else if(pixels[1] >= pixels[2]){
-                    outDilation.put(i,j,pixels[1]);
-                }else{
-                    outDilation.put(i,j,pixels[2]);
-                }
-            }
-        }
+        Core.max(listout.get(0),listout.get(1),outDilation);
+        Core.max(outDilation,listout.get(2),outDilation);
         //Log.d(TAG,"out Dilation");
         //Log.d(TAG,outDilation.dump());
-        Log.d(TAG,"end dilation33");
+        //Log.d(TAG,"end dilation33");
 
         return outDilation;
     }
 
     private Mat set_border(Mat in, double width){
-        Log.d(TAG,"start set_border");
+        //Log.d(TAG,"start set_border");
         Mat temp = new Mat(in.rows(),in.cols(),in.type(),new Scalar(1));
         for(int i = 0;i<temp.rows();i++){
             for(int j = 0;j<temp.cols();j++){
@@ -979,16 +1009,20 @@ public class ProcessImage {
         }
         Mat out = new Mat();
         Core.multiply(temp,in,out);
-        Log.d(TAG,"end set_border");
+        //Log.d(TAG,"end set_border");
 
         return out;
 
     }
 
     private double PoolingHistMax(Mat in,Mat mask,double cutoof){
-        Log.d(TAG,"start PoolingHistMax");
+        //Log.d(TAG,"start PoolingHistMax");
+        mask.convertTo(mask,CvType.CV_8U);
         int numNonzero = Core.countNonZero(in);
+        //Log.d(TAG,"nonzero: " + String.valueOf(numNonzero));
         //Log.d(TAG,in.dump());
+        Mat t = new Mat();
+        in.copyTo(t,mask);
         double[] h = new double[numNonzero];
         double[] pixels;
         int contador = 0;
@@ -1003,27 +1037,28 @@ public class ProcessImage {
         }
         Arrays.sort(h);
 
-        Log.d(TAG,"h");
+        //Log.d(TAG,"h");
         //Log.d(TAG,Arrays.toString(h));
         Core.MinMaxLocResult minMaxLocResult = Core.minMaxLoc(in);
         double maxValor = minMaxLocResult.maxVal;
         double lowerMaxPixels = cutoof * numNonzero;
         double upperMaxPixels = lowerMaxPixels * 1.5;
-
+        //Log.d(TAG,"maxValor: "+String.valueOf(maxValor));
+        //Log.d(TAG,"lower: " + String.valueOf(lowerMaxPixels) + " upper: "+String.valueOf(upperMaxPixels));
         int nbins = 0;
         if(maxValor < 256){
             nbins = 256;
         }else if(maxValor < 65536){
             nbins = 65536;
         }
-
+        //Log.d(TAG,"nbins: " + String.valueOf(nbins));
 
         Mat histogram = new Mat();
 
         MatOfFloat range = new MatOfFloat(0,256);
         List<Mat> arrayHist = new ArrayList<>();
         MatOfInt channels = new MatOfInt(0);
-        mask.convertTo(mask,CvType.CV_8U);
+
 
 
         MatOfInt hintsize = new MatOfInt(nbins);
@@ -1034,14 +1069,34 @@ public class ProcessImage {
         Imgproc.calcHist(arrayHist,channels,mask,histogram,hintsize,range,true);
 
         double[] values = linspace(h[0],minMaxLocResult.maxVal,nbins);
+        //Log.d(TAG,"values");
+        //Log.d(TAG,Arrays.toString(values));
 
+        //Log.d(TAG,"histogram");
+        //Log.d(TAG,histogram.dump());
         //Log.d(TAG,"cols: " + String.valueOf(histogram.cols()+" rows: " + String.valueOf(histogram.rows())));
         double jpixels = 0;
         double[] hisValor;
-
+        int j = nbins-2;
+        boolean finish = false;
         //Log.d(TAG,"histogram 0,0: " + Arrays.toString(histogram.get(0,0)));
-        for(int j = nbins;j > 0;j--){
-            hisValor = histogram.get(j-1,0);
+        while (j >-1 && finish == false){
+            hisValor = histogram.get(j,0);
+            //Log.d(TAG,"hisvalor: " + String.valueOf(hisValor[0]));
+            jpixels = hisValor[0] + jpixels;
+            //Log.d(TAG,"jpixel: " +String.valueOf(jpixels));
+            if(jpixels > lowerMaxPixels){
+                if (jpixels > upperMaxPixels){
+                    maxValor = values[j+1];
+                }else{
+                    maxValor = values[j];
+                }
+                finish = true;
+            }
+            j--;
+        }
+        /*for(int j = nbins-1;j > 0;j--){
+            hisValor = histogram.get(j,0);
             //Log.d(TAG,"j: " + String.valueOf(j));
             jpixels = hisValor[0] + jpixels;
             if(jpixels > lowerMaxPixels){
@@ -1054,10 +1109,11 @@ public class ProcessImage {
                     maxValor = values[j];
                 }
             }
-        }
+        }*/
 
-        Log.d(TAG,"end PoolingHistMAx");
-
+        //Log.d(TAG,"end PoolingHistMAx");
+        //Log.d(TAG,"maxValor");
+        //Log.d(TAG,String.valueOf(maxValor));
         return maxValor;
 
     }
@@ -1124,7 +1180,7 @@ public class ProcessImage {
 
 
         Core.divide(h,sum,h);
-        Log.d(TAG,"end gaussianFilter2");
+        //Log.d(TAG,"end gaussianFilter2");
 
         return h;
     }

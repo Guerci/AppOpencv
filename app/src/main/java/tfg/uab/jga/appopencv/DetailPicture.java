@@ -40,7 +40,8 @@ import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+
+
 
 import static org.opencv.imgproc.Imgproc.cvtColor;
 
@@ -57,6 +58,8 @@ public class DetailPicture extends AppCompatActivity {
     static final int USE_EFFECT = 35;
     static final int ADD_LUM = 10;
     static{System.loadLibrary("opencv_java3"); }
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,15 +87,16 @@ public class DetailPicture extends AppCompatActivity {
 
     }
 
-
-
     public void onClickProcess(){
-        final Bitmap[] out = new Bitmap[1];
+        final Bitmap out[] = new Bitmap[1];
         final ProgressDialog progressDialog = new ProgressDialog(DetailPicture.this);
         progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         progressDialog.setTitle("Processing");
         progressDialog.setMessage("Processing Image...");
         progressDialog.setCancelable(false);
+        Mat image;
+
+        progressDialog.show();
 
         Thread t = new Thread(new Runnable() {
             @Override
@@ -102,26 +106,23 @@ public class DetailPicture extends AppCompatActivity {
                 image = pi.surroundModulation(image);
                 out[0] = convertMat2Bitmap(image);
                 bmpInput = out[0];
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        imageView.setImageBitmap(out[0]);
+                    }
+                });
                 progressDialog.dismiss();
-
-
             }
         });
 
-        progressDialog.show();
+
 
         t.start();
 
-        try {
-            t.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        if(!t.isAlive()){
-            Log.d(TAG,"inside");
 
-            imageView.setImageBitmap(out[0]);
-        }
+
+
 
 
     }
