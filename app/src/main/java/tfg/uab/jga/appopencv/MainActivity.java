@@ -12,6 +12,7 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.Button;
 
 
 import org.opencv.android.BaseLoaderCallback;
@@ -63,6 +64,9 @@ public class MainActivity extends AppCompatActivity {
         Log.i(TAG, "main activity layout");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Button i =(Button) findViewById(R.id.btn_lenguage);
+        i.setVisibility(View.INVISIBLE);
+
 
 
     }
