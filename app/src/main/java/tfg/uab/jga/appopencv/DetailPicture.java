@@ -324,18 +324,7 @@ public class DetailPicture extends AppCompatActivity {
 
     }
 
-    private Mat getProcess(Mat image){
 
-        /*
-        Mat imgGrey = new Mat(height,width,CvType.CV_8UC1);
-        Imgproc.cvtColor(image,imgGrey,Imgproc.COLOR_RGB2GRAY);*/
-
-        ProcessImage pi = new ProcessImage();
-        pi.surroundModulation(image);
-
-
-        return image;
-    }
 
     public void rotateBitmap(String path){
         try{
@@ -407,7 +396,7 @@ public class DetailPicture extends AppCompatActivity {
         FileOutputStream out = null;
         String filename = getFileName();
         Bitmap bmp = bmpInput;
-        File sd = new File(Environment.getExternalStorageDirectory() + "/ASMApp");
+        File sd = new File(Environment.getExternalStorageDirectory() + "/appASM");
         boolean succes = true;
         if(!sd.exists()){
             succes = sd.mkdir();
@@ -415,12 +404,14 @@ public class DetailPicture extends AppCompatActivity {
         }
         if(succes){
 
-            File dest = new File(sd,filename);
+            //File dest = new File(sd,filename);
+            File dest = new File(sd.getPath() + File.separator + filename);
 
             try{
 
                 out = new FileOutputStream(dest);
                 bmp.compress(Bitmap.CompressFormat.PNG,100,out);
+
 
             }catch(Exception e){
                 e.printStackTrace();
@@ -430,6 +421,11 @@ public class DetailPicture extends AppCompatActivity {
                 try{
                     if(out != null){
                         out.close();
+
+                        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                        Uri contentUri = Uri.fromFile(dest);
+                        mediaScanIntent.setData(contentUri);
+                        this.sendBroadcast(mediaScanIntent);
 
                         Toast.makeText(this,this.getString(R.string.save_image_detail_picture),Toast.LENGTH_LONG).show();
 
