@@ -28,4 +28,10 @@
     <string name="save_image_detail_picture">Imagen guardada</string>
     <string name="select_lum_first">Seleccione primero una iluminación</string>
     <string name="lum_from_image">Añadida desde una imagen</string>
+    <string name="camera">Camera</string>
+    <string name="error_get_image">Error en obtener la imágen</string>
+    <string name="error_save_image">La imagen no se ha podido guardar</string>
+    <string name="valors_RGB">¡valores entre 0 y 255!</string>
+    <string name="process_image_title">Procesando</string>
+    <string name="Process_image_body">Procesando Imagen...</string>
 </resources>

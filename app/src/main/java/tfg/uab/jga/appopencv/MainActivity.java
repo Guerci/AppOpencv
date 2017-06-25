@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.SystemClock;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -56,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
     static final int STORAGE_PERMISSION_REQUEST = 5;
     static final int CAMERA_PERMISSION_REQUEST = 7;
     static final int BOTH_PERMISSIONS_REQUEST = 9;
+    static Uri imageUri;
 
     // These variables are used (at the moment) to fix camera orientation from 270degree to 0degree
     private static String TAG = "MainActivity";
@@ -98,12 +100,6 @@ public class MainActivity extends AppCompatActivity {
 
             ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.CAMERA},BOTH_PERMISSIONS_REQUEST);
         }
-
-
-
-
-
-
         if(code == STORAGE_PERMISSION_REQUEST){
             if(ActivityCompat.shouldShowRequestPermissionRationale(this,Manifest.permission.WRITE_EXTERNAL_STORAGE)){
                 Toast.makeText(this,"you need this permission to save your image!",Toast.LENGTH_LONG).show();
@@ -175,8 +171,16 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void onImageCamera(View view) {
+        /*
         Intent intent = new Intent(this, CameraActivity.class);
-        startActivity(intent);
+        startActivity(intent);*/
+
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        imageUri = Uri.fromFile(new File(Environment.getExternalStorageDirectory(),"fname_"+
+                                                String.valueOf(SystemClock.currentThreadTimeMillis())+".jpg"));
+        intent.putExtra(MediaStore.EXTRA_OUTPUT,imageUri);
+        startActivityForResult(intent,CAM_REQUEST);
+
     }
 
     public void onImageGallery(View v) {
@@ -220,14 +224,24 @@ public class MainActivity extends AppCompatActivity {
 
             case GALLERY_REQUEST:
                 if (resultCode == RESULT_OK) {
-                    Uri imageUri = data.getData(); //adress of the image
+                    Uri imageUriG = data.getData(); //adress of the image
                     //declare a stream to read the image data
 
                     Intent loadDisplayActivity = new Intent(this, DetailPicture.class);
-                    loadDisplayActivity.putExtra("uri", imageUri);
+                    loadDisplayActivity.putExtra("uri", imageUriG);
                     loadDisplayActivity.putExtra("code", GALLERY_REQUEST);
                     startActivity(loadDisplayActivity);
 
+
+                }
+                break;
+            case CAM_REQUEST:
+                if(resultCode == RESULT_OK){
+                    //Bundle extras = data.getExtras();
+                    Intent loadDisplayActivity = new Intent(this, DetailPicture.class);
+                    loadDisplayActivity.putExtra("uri",imageUri);
+                    loadDisplayActivity.putExtra("code",CAM_REQUEST);
+                    startActivity(loadDisplayActivity);
 
                 }
 

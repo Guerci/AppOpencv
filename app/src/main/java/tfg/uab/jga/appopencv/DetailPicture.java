@@ -51,12 +51,13 @@ public class DetailPicture extends AppCompatActivity {
     SharedPref sp;
     Bitmap bmpInput;
 
-    Mat matProcess;
+
     Luminance effect;
     String TAG = "DetailPicture";
     static final int SELECT_EFFECT = 100;
     static final int USE_EFFECT = 35;
     static final int ADD_LUM = 10;
+    static final int CAM_REQUEST = 1;
     static{System.loadLibrary("opencv_java3"); }
 
 
@@ -72,9 +73,14 @@ public class DetailPicture extends AppCompatActivity {
 
         //Bundle bd = getIntent().getExtras();
         int code = getIntent().getExtras().getInt("code");
-        if(code == 1){
-            String filename = getIntent().getExtras().getString("filename");
-            getImageFromCamera(filename);
+        if(code == CAM_REQUEST){
+            //String filename = getIntent().getExtras().getString("filename");
+            //getImageFromCamera(filename);
+            Bundle bd = getIntent().getExtras();
+            Uri uri = bd.getParcelable("uri");
+            getContentResolver().notifyChange(uri, null);
+            getImageFromCamera2(uri);
+
         }else{
             Bundle bd = getIntent().getExtras();
             Uri uri = bd.getParcelable("uri");
@@ -91,8 +97,8 @@ public class DetailPicture extends AppCompatActivity {
         final Bitmap out[] = new Bitmap[1];
         final ProgressDialog progressDialog = new ProgressDialog(DetailPicture.this);
         progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        progressDialog.setTitle("Processing");
-        progressDialog.setMessage("Processing Image...");
+        progressDialog.setTitle(getString(R.string.process_image_title));
+        progressDialog.setMessage(getString(R.string.Process_image_body));
         progressDialog.setCancelable(false);
         Mat image;
 
@@ -102,17 +108,20 @@ public class DetailPicture extends AppCompatActivity {
             @Override
             public void run() {
                 ProcessImage pi = new ProcessImage();
-                Mat image = convertBitmap2Mat(bmpInput);
+                //Mat image = convertBitmap2Mat(bmpInput);
+                Bitmap bmp = bmpInput;
+                Mat image = convertBitmap2Mat(bmp);
                 image = pi.surroundModulation(image);
                 out[0] = convertMat2Bitmap(image);
                 bmpInput = out[0];
+                progressDialog.dismiss();
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         imageView.setImageBitmap(out[0]);
                     }
                 });
-                progressDialog.dismiss();
+
             }
         });
 
@@ -224,50 +233,76 @@ public class DetailPicture extends AppCompatActivity {
 
     }
 
-    private void getImageFromCamera(String filename){
 
-        // Uri uri = bd.getParcelable("uri");
-        String picturePath = Environment.getExternalStorageDirectory()+"/frames/" + filename; //arreglar amb un path absolut
-        File f = new File(Environment.getExternalStorageDirectory()+"/frames/" + filename);
-        String path = f.getAbsolutePath();
-        // bmpInput = getBitmap(uri);
-        BitmapFactory.Options opt = new BitmapFactory.Options();
-        opt.inPreferredConfig = Bitmap.Config.ARGB_8888;
-        bmpInput = BitmapFactory.decodeFile(picturePath,opt);
-        rotateBitmap(path);
-        imageView.setImageBitmap(bmpInput);
-        //matInput = convertBitmap2Mat(bmpInput);
-        //matOutput = new Mat(matInput.rows(),matInput.cols(),CvType.CV_8UC3);
+    private void getImageFromCamera2(Uri uri){
+        try {
+            bmpInput = getBitmap(uri);
+            String path = uri.getPath();
+            rotateBitmap(path);
+            if (bmpInput != null) {
+                imageView.setImageBitmap(bmpInput);
+
+            } else {
+                Toast.makeText(this, this.getString(R.string.error_get_image), Toast.LENGTH_LONG).show();
+            }
+
+        }catch (Exception e) {
+            Toast.makeText(this, this.getString(R.string.error_show_image), Toast.LENGTH_LONG).show();
+            Log.d(TAG,e.toString());
+        }
+
     }
+
 
     private void getImageFromGallery(Uri uri){
         try{
+            Log.d(TAG,"uri: " + uri.toString());
             bmpInput = getBitmap(uri);
-
             String path = getRealPathFromURI(uri);
             rotateBitmap(path);
             if(bmpInput != null){
                 imageView.setImageBitmap(bmpInput);
+
             }else{
-                Toast.makeText(this, "Error al capturar la imatge", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, this.getString(R.string.error_get_image), Toast.LENGTH_LONG).show();
             }
 
         } catch (Exception e) {
             Toast.makeText(this, this.getString(R.string.error_show_image), Toast.LENGTH_LONG).show();
-            e.printStackTrace();
+            Log.d(TAG,e.toString());
         }
     }
     private String getRealPathFromURI(Uri contentUri) {
+
         String[] proj = { MediaStore.Images.Media.DATA };
+
         CursorLoader loader = new CursorLoader(this, contentUri, proj, null, null, null);
         Cursor cursor = loader.loadInBackground();
         int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
         cursor.moveToFirst();
         String result = cursor.getString(column_index);
-        Log.d(TAG,result);
+
         cursor.close();
         return result;
     }
+
+    public Bitmap scaleBitmap(Bitmap bmp){
+        Bitmap b = bmp;
+        final int IMAGE_MAX_SIZE = 1200000;
+        int height = b.getHeight();
+        int width = b.getWidth();
+        //Log.d(TAG, "1th scale operation dimensions- width: " + width + ", height: " + height);
+        double y = Math.sqrt(IMAGE_MAX_SIZE / (((double)width)/height));
+        double x = (y/height) * width;
+
+        Bitmap scaledBitmap = Bitmap.createScaledBitmap(b,(int)x,(int)y, true);
+
+        b.recycle();
+        b = scaledBitmap;
+        return b;
+
+    }
+
 
     public Bitmap getBitmap(Uri path){
 
@@ -285,7 +320,7 @@ public class DetailPicture extends AppCompatActivity {
             while((bmfOptions.outWidth * bmfOptions.outHeight)*(1/Math.pow(scale, 2)) > IMAGE_MAX_SIZE){
                 scale ++;
             }
-            Log.d("InfoScale", "scale = " + scale + ", orig-with; " + bmfOptions.outWidth + ", orig-height: "+ bmfOptions.outHeight);
+            //Log.d(TAG, "scale = " + scale + ", orig-with; " + bmfOptions.outWidth + ", orig-height: "+ bmfOptions.outHeight);
 
             Bitmap b;
             is = getContentResolver().openInputStream(path);
@@ -298,7 +333,7 @@ public class DetailPicture extends AppCompatActivity {
 
                 int height = b.getHeight();
                 int width = b.getWidth();
-                Log.d("InfoScale", "1th scale operation dimensions- width: " + width + ", height: " + height);
+                //Log.d(TAG, "1th scale operation dimensions- width: " + width + ", height: " + height);
                 double y = Math.sqrt(IMAGE_MAX_SIZE / (((double)width)/height));
                 double x = (y/height) * width;
 
@@ -306,11 +341,12 @@ public class DetailPicture extends AppCompatActivity {
 
                 b.recycle();
                 b = scaledBitmap;
-                //imageView.setRotation(90);
+
 
 
             }else{
                 b = BitmapFactory.decodeStream(is);
+
 
             }
             is.close();
@@ -354,7 +390,8 @@ public class DetailPicture extends AppCompatActivity {
     public void onGetLumFromImage(){
         ProcessImage processImage = new ProcessImage();
         ArrayList<Integer> rgba;
-        Bitmap src = ((BitmapDrawable)imageView.getDrawable()).getBitmap();
+        //Bitmap src = ((BitmapDrawable)imageView.getDrawable()).getBitmap();
+        Bitmap src = bmpInput;
         Mat imageMat = convertBitmap2Mat(src);
         rgba = processImage.getLuminanceFromMat(imageMat);
         Luminance lum = new Luminance(rgba,this);
@@ -362,8 +399,7 @@ public class DetailPicture extends AppCompatActivity {
         addLum.putExtra("code",20);
         addLum.putExtra("Lum",lum);
         startActivityForResult(addLum,ADD_LUM);
-       /* sp.addLuminance(this,lum);
-        Toast.makeText(this,"lum added",Toast.LENGTH_LONG).show();*/
+
     }
 
     @Override
@@ -404,7 +440,7 @@ public class DetailPicture extends AppCompatActivity {
         }
         if(succes){
 
-            //File dest = new File(sd,filename);
+
             File dest = new File(sd.getPath() + File.separator + filename);
 
             try{
@@ -436,7 +472,7 @@ public class DetailPicture extends AppCompatActivity {
                 }
             }
         }else{
-            Toast.makeText(this,"no s'ha pogut guardar la imatge",Toast.LENGTH_LONG).show();
+            Toast.makeText(this,this.getString(R.string.error_save_image),Toast.LENGTH_LONG).show();
 
         }
 

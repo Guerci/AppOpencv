@@ -28,4 +28,10 @@
     <string name="save_image_detail_picture">Image saved</string>
     <string name="select_lum_first">Select luminance first</string>
     <string name="lum_from_image">Added from image</string>
+    <string name="cámera">Camera</string>
+    <string name="error_get_image">Error on getting image</string>
+    <string name="error_save_image">Image coudn\'t be saved</string>
+    <string name="valors_RGB">valor between 0 and 255!</string>
+    <string name="process_image_title">Processing</string>
+    <string name="Process_image_body">Processing Image...</string>
 </resources>

@@ -61,7 +61,7 @@ public class ListLuminanceAdapter extends ArrayAdapter<Luminance> {
             holder.textGreen = (TextView) convertView.findViewById(R.id.txt_green);
             holder.textName = (TextView) convertView.findViewById(R.id.txt_name);
             holder.textRed = (TextView) convertView.findViewById(R.id.txt_red);
-            holder.textAlpha = (TextView) convertView.findViewById(R.id.txt_aplha);
+
             convertView.setTag(holder);
         }
         else{
@@ -72,7 +72,7 @@ public class ListLuminanceAdapter extends ArrayAdapter<Luminance> {
         holder.textRed.setText(Integer.toString(lum.getRed()));
         holder.textGreen.setText(Integer.toString(lum.getGreen()));
         holder.textName.setText(lum.getName());
-        holder.textAlpha.setText(Integer.toString(lum.getAlpha()));
+
         return convertView;
     }
 

@@ -86,7 +86,7 @@ public class SharedPref {
         return (ArrayList<Luminance>) listLumi;
     }
 
-    public void editLuminance(Context context, Luminance luminanceOld, int red, int green, int blue, String name, int alpha){
+    public void editLuminance(Context context, Luminance luminanceOld, int red, int green, int blue, String name){
         ArrayList<Luminance> listLumi = getLuminance(context);
         int positiondelete;
 
@@ -108,7 +108,7 @@ public class SharedPref {
                 lum.setGreen(green);
                 lum.setRed(red);
                 lum.setName(name);
-                lum.setAlpha(alpha);
+
                 listLumi.set(index,lum);
                 edit = true;
             }

@@ -7,6 +7,7 @@ import android.support.annotation.IntegerRes;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -30,11 +31,14 @@ public class AddLuminance extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_luminance);
 
+        Button del = (Button) findViewById(R.id.remove_luminance);
+
+
         blue = (EditText) findViewById(R.id.blueColor);
         green = (EditText) findViewById(R.id.greenColor);
         red = (EditText) findViewById(R.id.redColor);
         name = (EditText) findViewById(R.id.nameLuminance);
-        alpha = (EditText) findViewById(R.id.alphaDepth);
+
         sp = new SharedPref();
 
         code = getIntent().getExtras().getInt("code");
@@ -45,6 +49,8 @@ public class AddLuminance extends AppCompatActivity {
             lum = (Luminance) getIntent().getExtras().getSerializable("Lum");
             editLuminance();
 
+        }else if (code == ADD_LUM){
+            del.setVisibility(View.INVISIBLE);
         }
 
     }
@@ -56,23 +62,29 @@ public class AddLuminance extends AppCompatActivity {
         int redNumber = Integer.valueOf(red.getText().toString()).intValue();
         int blueNumber = Integer.valueOf(blue.getText().toString()).intValue();
         int greenNumber = Integer.valueOf(green.getText().toString()).intValue();
-        int alphaDepth = Integer.valueOf(alpha.getText().toString()).intValue();
-        String newName = name.getText().toString();
 
-        if(code == EDIT_LUM) {
-            sp.editLuminance(this, lum, redNumber, greenNumber, blueNumber, newName, alphaDepth);
-            Toast.makeText(this, this.getString(R.string.lum_edited), Toast.LENGTH_SHORT).show();
-        }else if(code == ADD_LUM_AUTO){
-            luminance = new Luminance(random.nextInt(),newName,redNumber,blueNumber,greenNumber,alphaDepth);
-            Intent backToDetail = new Intent();
-            backToDetail.putExtra("result",luminance);
-            setResult(Activity.RESULT_OK,backToDetail);
+        String newName = name.getText().toString();
+        if(redNumber <=255 && blueNumber <=255 && greenNumber <= 255){
+            if(code == EDIT_LUM) {
+                sp.editLuminance(this, lum, redNumber, greenNumber, blueNumber, newName);
+                Toast.makeText(this, this.getString(R.string.lum_edited), Toast.LENGTH_SHORT).show();
+            }else if(code == ADD_LUM_AUTO){
+                luminance = new Luminance(random.nextInt(),newName,redNumber,blueNumber,greenNumber);
+                Intent backToDetail = new Intent();
+                backToDetail.putExtra("result",luminance);
+                setResult(Activity.RESULT_OK,backToDetail);
+
+            }else{
+                luminance = new Luminance(random.nextInt(),newName,redNumber,blueNumber,greenNumber);
+                sp.addLuminance(this,luminance);
+                Toast.makeText(this, this.getString(R.string.lum_added), Toast.LENGTH_SHORT).show();
+            }
             finish();
         }else{
-            luminance = new Luminance(random.nextInt(),newName,redNumber,blueNumber,greenNumber,alphaDepth);
-            sp.addLuminance(this,luminance);
-            Toast.makeText(this, this.getString(R.string.lum_added), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this,this.getString(R.string.valors_RGB),Toast.LENGTH_LONG).show();
         }
+
+
 
 
     }
@@ -81,7 +93,7 @@ public class AddLuminance extends AppCompatActivity {
         blue.setText(Integer.toString(lum.getBlue()));
         red.setText(Integer.toString(lum.getRed()));
         green.setText(Integer.toString(lum.getGreen()));
-        alpha.setText(Integer.toString(lum.getAlpha()));
+
         name.setText(lum.getName());
 
 
@@ -90,5 +102,6 @@ public class AddLuminance extends AppCompatActivity {
     public void onRemoveLum(View v){
         sp.removeLuminance(this,lum);
         Toast.makeText(this,this.getString(R.string.lum_removed),Toast.LENGTH_LONG).show();
+        finish();
     }
 }

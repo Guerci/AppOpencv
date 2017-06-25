@@ -109,6 +109,7 @@ public class CameraActivity extends AppCompatActivity implements CameraBridgeVie
 
     @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
+        System.gc();
         mRgba = inputFrame.rgba();
         mRgbaT = mRgba.t();
         Core.flip(mRgba.t(), mRgbaT, 1);
@@ -123,6 +124,7 @@ public class CameraActivity extends AppCompatActivity implements CameraBridgeVie
         i.putExtra("filename",filename);
         i.putExtra("code",CAM);
         startActivity(i);
+        finish();
     }
 
     private void takePicture(Mat image){
